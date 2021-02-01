@@ -528,35 +528,17 @@ begin
   FPONotifyObservers(Self,ooCustom,pointer(Self.Count)); { fpc built-in observer pattern }
 end;
 
-{ TBlobCollectionItem }
-
-procedure TBlobCollectionItem.AssignData(aSource: TBlobCollectionItem);
-begin
-  fBlob_Id:= aSource.Blob_Id;
-  fDocName:= aSource.DocName;
-  fDocType:= aSource.DocType;
-  fDate.AsInteger:= aSource.Date.AsInteger;
-  fBlobFilename:= aSource.BlobFilename;
-  fBlob.Position:= 0;
-  aSource.Blob.Position:= 0;
-  fBlob.CopyFrom(aSource.Blob,aSource.Blob.Size);
-  fBlob.Position:= 0;
-  aSource.Blob.Position:= 0;
-  fFlag:= aSource.Flag;
-  fReserved:= aSource.Reserved;
-end;
-
-constructor TBlobCollectionItem.Create(aCollection: TBlobCollection);
+constructor TDDCollectionItem.Create(aCollection: TBlobCollection);
 begin
   inherited Create(aCollection);
   fDate:= TIsoDate.Create(now);
   fBlob:= TMemoryStream.Create;
 end;
 
-destructor TBlobCollectionItem.Destroy;
+destructor TDDCollectionItem.Destroy;
 begin
   FreeAndNil(fDate);
-  FreeAndNil(fBlob);
+  FreeAndNil(fText);
   inherited Destroy;
 end;
 

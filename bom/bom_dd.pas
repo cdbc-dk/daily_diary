@@ -528,17 +528,17 @@ begin
   FPONotifyObservers(Self,ooCustom,pointer(Self.Count)); { fpc built-in observer pattern }
 end;
 
-constructor TBlobCollectionItem.Create(aCollection: TBlobCollection);
+constructor TDDCollectionItem.Create(aCollection: TBlobCollection);
 begin
   inherited Create(aCollection);
   fDate:= TIsoDate.Create(now);
-  fBlob:= TMemoryStream.Create;
+  fText:= TMemoryStream.Create;
 end;
 
-destructor TBlobCollectionItem.Destroy;
+destructor TDDCollectionItem.Destroy;
 begin
   FreeAndNil(fDate);
-  FreeAndNil(fBlob);
+  FreeAndNil(fText);
   inherited Destroy;
 end;
 
