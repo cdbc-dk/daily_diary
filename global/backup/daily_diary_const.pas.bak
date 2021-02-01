@@ -81,6 +81,9 @@ begin
   end;
 end;
 
+(*
+  TLongBoolHelper = Type Helper for LongBool
+*)
 end.
 
 

@@ -14,8 +14,14 @@
       </XPManifest>
       <Icon Value="0"/>
     </General>
+    <MacroValues Count="1">
+      <Macro1 Name="LCLWidgetType" Value="qt"/>
+    </MacroValues>
     <BuildModes Count="1">
       <Item1 Name="Default" Default="True"/>
+      <SharedMatrixOptions Count="1">
+        <Item1 ID="838475807544" Modes="Default" Type="IDEMacro" MacroName="LCLWidgetType" Value="qt"/>
+      </SharedMatrixOptions>
     </BuildModes>
     <PublishOptions>
       <Version Value="2"/>
@@ -30,7 +36,7 @@
         <PackageName Value="LCL"/>
       </Item1>
     </RequiredPackages>
-    <Units Count="3">
+    <Units Count="4">
       <Unit0>
         <Filename Value="daily_diary.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -39,12 +45,17 @@
         <Filename Value="lfm_main.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="frmMain"/>
+        <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
       </Unit1>
       <Unit2>
         <Filename Value="const/daily_diary_const.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit2>
+      <Unit3>
+        <Filename Value="bom/bom_dd.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit3>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
@@ -53,8 +64,8 @@
       <Filename Value="daily_diary"/>
     </Target>
     <SearchPaths>
-      <IncludeFiles Value="$(ProjOutDir)"/>
-      <OtherUnitFiles Value="global"/>
+      <IncludeFiles Value="$(ProjOutDir);../../bc_rtl/include"/>
+      <OtherUnitFiles Value="global;bom;../../bc_rtl"/>
       <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <Linking>

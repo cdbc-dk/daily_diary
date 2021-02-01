@@ -9,7 +9,7 @@ uses
 
 const
   MainTitle = 'Daily Diary';
-  Version = '0.28.01.2021-alfa';
+  Version = '0.01.02.2021-alfa';
   cdsQuit = -999;
   { sql statements }
   { create daily diary table }

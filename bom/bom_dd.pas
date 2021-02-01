@@ -5,7 +5,7 @@ interface
 uses
   Classes, SysUtils, db,
   bc_utilities,
-//  blob_settings,
+  dd_settings,
   daily_diary_const,
   bc_datetime,
   bc_mtlinklist,
@@ -21,16 +21,14 @@ type
   end;
 
   TDDCollection = class;
-  { *** TBlobCollectionItem *** }
-
-  { TDDCollectionItem }
-
+  { *** TDDCollectionItem *** }
   TDDCollectionItem = class(TCollectionItem)
   private
     fId_DD: ptruint;       // id from database
     fDate: TIsoDate;       // well duh!
     fWeekNumber: ptruint;  // week number
     fText: TStream;        // binary large object - can be anything
+//    fText: TNamedMemorystream;
     fReserved: string;     // text field reserved for future use
     fModified: byte;       // modification status
   protected
@@ -42,45 +40,45 @@ type
     property Date: TIsoDate read fDate write fDate;
     property WeekNumber: ptruint read fWeekNumber write fWeekNumber;
     property Text: TStream read fText write fText;
+//    property Text: TNamedMemorystream read fText write fText;
     property Reserved: string read fReserved write fReserved;
     property Modified: byte read fModified write fModified;
-  end;
+  end; { TDDCollectionItem }
 
-  { *** TBlobQueue *** }
-  TBlobQueue = class(TbcQueue)
+  { *** TDDQueue *** }
+  TDDQueue = class(TbcQueue)
   public
-    function CreateNew: TBlobCollectionItem;
-    procedure Enqueue(anItem: TBlobCollectionItem);
-    function Dequeue: TBlobCollectionItem;
-    function Peek: TBlobCollectionItem; // only peeking does not remove from Q
+    function CreateNew: TDDCollectionItem;
+    procedure Enqueue(anItem: TDDCollectionItem);
+    function Dequeue: TDDCollectionItem;
+    function Peek: TDDCollectionItem; // only peeking does not remove from Q
   end;
 
-  { TBlobCollection }
-
-  TBlobCollection = class(TCollection)
+  { *** TDDCollection *** }
+  TDDCollection = class(TCollection)
   private
     fBatch: boolean;
     fSortOrder: integer;
     function get_DbName: string;
     function get_EngineVersion: string;
     procedure set_DbName(aValue: string);
-    procedure DeleteItem(anItem: TBlobCollectionItem); { remove item from collection }
+    procedure DeleteItem(anItem: TDDCollectionItem); { remove item from collection }
   protected
     fDb: TLiteDb;
-    fDeltaQueue: TBlobQueue;
+    fDeltaQueue: TDDQueue;
     fUpdateCount: ptrint;
     procedure DoUpdate; { refactored 29.07.2015 bc }
-    function AddRecord(anItem: TBlobCollectionItem): ptruint; // result is the new ID for the current record
-    procedure UpdateRecord(anItem: TBlobCollectionItem);
-    procedure DeleteRecord(anItem: TBlobCollectionItem); { remove from database backend }
+    function AddRecord(anItem: TDDCollectionItem): ptruint; // result is the new ID for the current record
+    procedure UpdateRecord(anItem: TDDCollectionItem);
+    procedure DeleteRecord(anItem: TDDCollectionItem); { remove from database backend }
   public
     constructor Create(anItemClass: TCollectionItemClass);
     destructor Destroy; override;
     function CheckTable: boolean; { creates a new table in db-file }
-    function AddNew: TBlobCollectionItem;
+    function AddNew: TDDCollectionItem;
     procedure BackupDb; { 19.04.2015 bc }
-    procedure AppendToDelta(anItem: TBlobCollectionItem);
-    function IndexOf(anItem: TBlobCollectionItem): ptrint; { 11.05.2015 bc, returns -1 on not found else collection ID }
+    procedure AppendToDelta(anItem: TDDCollectionItem); { api }
+    function IndexOf(anItem: TDDCollectionItem): ptrint; { 11.05.2015 bc, returns -1 on not found else collection ID }
     function UpdateDb(const UpdateNow: boolean): boolean; { refactored 29.07.2015 bc }
     function ReadDb: boolean;
     property UpdateCount: ptrint read fUpdateCount write fUpdateCount;
@@ -88,27 +86,125 @@ type
     property BatchUpdate: boolean read fBatch write fBatch;
     property SortOrder: integer read fSortOrder write fSortOrder;
     property EngineVersion: string read get_EngineVersion;
-  end;
+  end; { *** TDDCollection *** }
 
 { Bom - factory }
-function CreateBom: TBlobCollection;
+function CreateBom: TDDCollection;
 
 implementation
 uses bc_memdataset;
+var Singleton: TDDCollection;
 
-function CreateBom: TBlobCollection;
+function CreateBom: TDDCollection;
 begin
-  Result:= TBlobCollection.Create(TBlobCollectionItem);
+  if not assigned(Singleton) then Singleton:= TDDCollection.Create(TDDCollectionItem);
+  Result:= Singleton;
+end;
+
+{ TDDCollection }
+
+function TDDCollection.get_DbName: string;
+begin
+
+end;
+
+function TDDCollection.get_EngineVersion: string;
+begin
+
+end;
+
+procedure TDDCollection.set_DbName(aValue: string);
+begin
+
+end;
+
+procedure TDDCollection.DeleteItem(anItem: TDDCollectionItem);
+begin
+
+end;
+
+procedure TDDCollection.DoUpdate;
+begin
+
+end;
+
+function TDDCollection.AddRecord(anItem: TDDCollectionItem): ptruint;
+begin
+
+end;
+
+procedure TDDCollection.UpdateRecord(anItem: TDDCollectionItem);
+begin
+
+end;
+
+procedure TDDCollection.DeleteRecord(anItem: TDDCollectionItem);
+begin
+
+end;
+
+constructor TDDCollection.Create(anItemClass: TCollectionItemClass);
+begin
+  inherited Create(anItemClass);
+  fDb:= TLiteDb.Create;
+  fDb.DbName:= DDSettings.Databasename; { 19.04.2015 /bc }
+  fDb.Connect;
+  CheckTable; // create table if non existing
+  if fDb.Connected then fDb.DisConnect; // no idle connections
+  fDeltaQueue:= TDDQueue.Create; // delta for use with insertion
+  fBatch:= false;
+  fBatch:= DDSettings.BatchUpdates; { 19.04.2015 /bc }
+  fUpdateCount:= DDSettings.BatchCount; { 19.04.2015 /bc }
+end;
+
+destructor TDDCollection.Destroy;
+begin
+  inherited Destroy;
+end;
+
+function TDDCollection.CheckTable: boolean;
+begin
+
+end;
+
+function TDDCollection.AddNew: TDDCollectionItem;
+begin
+
+end;
+
+procedure TDDCollection.BackupDb;
+begin
+
+end;
+
+procedure TDDCollection.AppendToDelta(anItem: TDDCollectionItem);
+begin
+
+end;
+
+function TDDCollection.IndexOf(anItem: TDDCollectionItem): ptrint;
+begin
+
+end;
+
+function TDDCollection.UpdateDb(const UpdateNow: boolean): boolean;
+begin
+
+end;
+
+function TDDCollection.ReadDb: boolean;
+begin
+
 end;
 
 { TDDCollectionItem }
-
+{ nifty feature if you need to clone an item }
 procedure TDDCollectionItem.AssignData(aSource: TDDCollectionItem);
 begin
   fId_DD:= aSource.Id_DD;           // id from database
   fDate:= aSource.Date;             // well duh!
   fWeekNumber:= aSource.WeekNumber; // week number
-  fText:= TStream;                  // binary large object - can be anything
+  fText:= aSource.Text;             // binary large object - can be anything
   fReserved:= aSource.Reserved;     // text field reserved for future use
   fModified:= aSource.Modified;     // modification states ~ mNone, mAdded, mAltered & mDelete
 end;
@@ -179,22 +275,22 @@ begin
   else Result:= 0;
 end;
 
-function TBlobCollection.get_DbName: string;
+function TDDCollection.get_DbName: string;
 begin
   Result:= fDb.DbName;
 end;
 
-function TBlobCollection.get_EngineVersion: string;
+function TDDCollection.get_EngineVersion: string;
 begin
-  Result:= blob_const.UnitVersion;
+  Result:= daily_diary_const.UnitVersion;
 end;
 
-procedure TBlobCollection.set_DbName(aValue: string);
+procedure TDDCollection.set_DbName(aValue: string);
 begin
   fDb.DbName:= aValue;
 end;
 
-procedure TBlobCollection.DeleteItem(anItem: TBlobCollectionItem);
+procedure TDDCollection.DeleteItem(anItem: TDDCollectionItem);
 var
   Res,ItemId: ptrint;
 begin
@@ -204,30 +300,30 @@ begin
   if Res > -1 then Delete(Res);
 end;
 
-function TBlobCollection.CheckTable: boolean; { creates a new db if not existing }
+function TDDCollection.CheckTable: boolean; { creates a new db if not existing }
 begin
   Result:= true;
   { creates a new db if not existing }
-  try fDb.RunSQL(CreateBlobDb); except  end;
+  try fDb.RunSQL(daily_diary_const.CreateDb); except  end;
 end;
 
-procedure TBlobCollection.DoUpdate; { refactored 29.07.2015 bc }
+procedure TDDCollection.DoUpdate; { refactored 29.07.2015 bc }
 var
-  Tmp,New: TBlobCollectionItem;
+  Tmp,New: TDDCollectionItem;
 begin
   while not fDeltaQueue.IsEmpty do begin
     Tmp:= fDeltaQueue.Dequeue;
     case Tmp.Modified of
       mAdded: begin
-                New:= TBlobCollectionItem(Add); { gets an ownership from collection }
+                New:= TDDCollectionItem(Add); { gets an ownership from collection }
                 AddRecord(Tmp);
                 New.AssignData(Tmp);
                 //ææ
               end;
       mAltered: fDb.RunSQL('');
       mDelete: begin
-                 DeleteRecord(Tmp); { takes care of the database back-end }
-                 DeleteItem(Tmp); { removes the item from our collection }
+                 DeleteRecord(Tmp);  { takes care of the database back-end }
+                 DeleteItem(Tmp);   { removes the item from our collection }
                end;
     end;
     FreeAndNil(Tmp);
@@ -235,7 +331,7 @@ begin
 end;
 
 { addrecord persists anitem to database and returns the new row_id as a result }
-function TBlobCollection.AddRecord(anItem: TBlobCollectionItem): ptruint;
+function TDDCollection.AddRecord(anItem: TDDCollectionItem): ptruint;
 begin
   if fDb.Connect then begin
     if not fDb.Transaction.Active then begin
@@ -256,7 +352,7 @@ begin
       fDb.Query.SQL.Text:= LastIdSql; { 'SELECT LAST_INSERT_ROWID() AS Id_Last;' }
       fDb.Query.Open;
       Result:= fDb.Query.FieldByName('Id_Last').AsInteger;
-      anItem.Blob_Id:= Result;
+      anItem.Id_DD:= Result;
       fDb.Query.Close;
       fDb.Transaction.Commit;
       anItem.Modified:= mNone;
@@ -265,12 +361,12 @@ begin
   end;
 end;
 
-procedure TBlobCollection.UpdateRecord(anItem: TBlobCollectionItem);
+procedure TDDCollection.UpdateRecord(anItem: TBlobCollectionItem);
 begin
-
+  // TODO
 end;
 
-procedure TBlobCollection.DeleteRecord(anItem: TBlobCollectionItem); { ok }
+procedure TDDCollection.DeleteRecord(anItem: TDDCollectionItem); { ok }
 begin
   if fDb.Connect then begin
     if not fDb.Transaction.Active then begin
@@ -278,7 +374,7 @@ begin
       fDb.Query.Close;
       fDb.Query.SQL.Text:= DelBlobSql;
       fDb.Query.Prepare;
-      fDb.Query.ParamByName('pid').AsInteger:= anItem.Blob_Id;
+      fDb.Query.ParamByName('pid').AsInteger:= anItem.Id_DD;
       fDb.Query.ExecSQL;
       fDb.Transaction.Commit;
     end;
@@ -286,21 +382,21 @@ begin
   end;
 end;
 
-constructor TBlobCollection.Create(anItemClass: TCollectionItemClass); { ok }
+constructor TDDCollection.Create(anItemClass: TCollectionItemClass); { ok }
 begin
   inherited Create(anItemClass);
   fDb:= TLiteDb.Create;
-  fDb.DbName:= BlobSettings.Databasename; { 19.04.2015 bc }
+  fDb.DbName:= DDSettings.Databasename; { 19.04.2015 bc }
   fDb.Connect;
   CheckTable; // create table if non existing
   if fDb.Connected then fDb.DisConnect; // no idle connections
-  fDeltaQueue:= TBlobQueue.Create;
+  fDeltaQueue:= TDDQueue.Create;
   fBatch:= false;
-  fBatch:= BlobSettings.BatchUpdates; { 19.04.2015 bc }
-  fUpdateCount:= BlobSettings.BatchCount; { 19.04.2015 bc }
+  fBatch:= DDSettings.BatchUpdates; { 19.04.2015 bc }
+  fUpdateCount:= DDSettings.BatchCount; { 19.04.2015 bc }
 end;
 
-destructor TBlobCollection.Destroy;
+destructor TDDCollection.Destroy;
 begin
   if not fDeltaQueue.IsEmpty then UpdateDb(true);
   fDeltaQueue.Free;
@@ -309,21 +405,21 @@ begin
   inherited Destroy;
 end;
 
-function TBlobCollection.AddNew: TBlobCollectionItem; { ok }
+function TDDCollection.AddNew: TDDCollectionItem; { ok }
 begin
   Result:= fDeltaQueue.CreateNew;
-  Result.Blob_Id:= -1;        //ææ
+  Result.Id_DD:= 0;
   Result.Date.AsDate:= now;
 end;
 
-procedure TBlobCollection.BackupDb; { ok }
+procedure TDDCollection.BackupDb; { ok }
 var
   BackupFilename: string;
   Buffer: array[0..4095] of byte; { 4 Kb buffer }
   InStream,OutStream: TFileStream;
   Cnt,I,Res: Int64;
 begin
-  BackupFilename:= BlobSettings.BackupPath;
+  BackupFilename:= DDSettings.BackupPath;
   FillChar(Buffer,4096,0); { 11.05.2015 bc }
   if BackupFilename <> 'Not defined' then begin
     { now construct the actual backupname with a date and .bak extension }
@@ -360,7 +456,7 @@ begin
   end;
 end;
 
-procedure TBlobCollection.AppendToDelta(anItem: TBlobCollectionItem); { ok }
+procedure TDDCollection.AppendToDelta(anItem: TDDCollectionItem); { ok }
 begin
   if assigned(anItem) then begin
     fDeltaQueue.Enqueue(anItem); // add to delta for db persistence
@@ -370,24 +466,23 @@ begin
   end;
 end;
 
-function TBlobCollection.IndexOf(anItem: TBlobCollectionItem): ptrint; { ok }
+function TDDCollection.IndexOf(anItem: TDDCollectionItem): ptrint; { ok }
 var
   Idx: longint;
-  Tmp: TBlobCollectionItem;
+  Tmp: TDDCollectionItem;
 begin
   Result:= -1; { not found }
   for Idx:= 0 to Count-1 do begin { linear search (O(n)) }
-    Tmp:= TBlobCollectionItem(Items[Idx]);
-    if ((Tmp.DocName = anItem.DocName) and (Tmp.DocType = anItem.DocType) and
-       (Tmp.Date.AsInteger = anItem.Date.AsInteger) and (Tmp.Flag = anItem.Flag) and
-       (Tmp.Reserved = anItem.Reserved)) then begin
+    Tmp:= TDDCollectionItem(Items[Idx]);
+    if ((Tmp.Date.AsInteger = anItem.Date.AsInteger) and (Tmp.WeekNumber = anItem.WeekNumber) and
+       (Tmp.Text = anItem.Text) and (Tmp.Reserved = anItem.Reserved)) then begin
       Result:= Idx;
       Break;
     end;
   end;
 end;
 
-function TBlobCollection.UpdateDb(const UpdateNow: boolean): boolean; { ok }// db writes
+function TDDCollection.UpdateDb(const UpdateNow: boolean): boolean; { ok }// db writes
 begin { original code moved to "cutaway.txt" }
   Result:= false;
   if not fDb.Connected then fDb.Connect;
@@ -398,10 +493,10 @@ begin { original code moved to "cutaway.txt" }
   Result:= true;
 end; { refactored 29.07.2015 bc -> actual writes moved to "DoUpdate" }
 
-function TBlobCollection.ReadDb: boolean; // db reads
+function TDDCollection.ReadDb: boolean; // db reads
 var
   Ds: TMemDataset;
-  Bci: TBlobCollectionItem;
+  Bci: TDDCollectionItem;
 begin
   Result:= false;
   Clear;
@@ -409,20 +504,15 @@ begin
   BeginUpdate;
   Ds:= TMemDataset.Create(nil);
   try
-    fDb.QuerySQL(SelBlobSql,Ds); // fills the dataset with fielddefs and data
+    fDb.QuerySQL(daily_diary_const.SelSql,Ds); // fills the dataset with fielddefs and data
     Ds.First;
     while not Ds.EOF do begin
-      Bci:= TBlobCollectionItem(Add);
-      Bci.Blob_Id:= Ds.FieldByName('id_blob').AsInteger;
-      Bci.DocName:= Ds.FieldByName('docname_blob').AsString;
-      Bci.DocType:= Ds.FieldByName('doctype_blob').AsString;
-      Bci.Date.AsInteger:= Ds.FieldByName('date_blob').AsInteger;
-      // ??? ææ
-      case Ds.FieldByName('flag_blob').AsInteger of
-        0: Bci.Flag:= false;
-        1: Bci.Flag:= true;
-      end;
-      Bci.Reserved:= Ds.FieldByName('reserved_blob').AsString;
+      Bci:= TDDCollectionItem(Add);
+      Bci.Id_DD:= Ds.FieldByName('id_dd').AsInteger;
+      Bci.Date.AsInteger:= Ds.FieldByName('date_dd').AsInteger;
+      Bci.WeekNumber:= Ds.FieldByName('weeknumber_dd').AsInteger;
+      Bci.Text:= Ds.FieldByName('text_dd'); // should not work!
+      Bci.Reserved:= Ds.FieldByName('reserved_dd').AsString;
       Ds.Next;
     end;
     Result:= true;
@@ -436,24 +526,6 @@ begin
   EndUpdate;
   if fDb.Connected then fDb.DisConnect;
   FPONotifyObservers(Self,ooCustom,pointer(Self.Count)); { fpc built-in observer pattern }
-end;
-
-{ TBlobCollectionItem }
-
-procedure TBlobCollectionItem.AssignData(aSource: TBlobCollectionItem);
-begin
-  fBlob_Id:= aSource.Blob_Id;
-  fDocName:= aSource.DocName;
-  fDocType:= aSource.DocType;
-  fDate.AsInteger:= aSource.Date.AsInteger;
-  fBlobFilename:= aSource.BlobFilename;
-  fBlob.Position:= 0;
-  aSource.Blob.Position:= 0;
-  fBlob.CopyFrom(aSource.Blob,aSource.Blob.Size);
-  fBlob.Position:= 0;
-  aSource.Blob.Position:= 0;
-  fFlag:= aSource.Flag;
-  fReserved:= aSource.Reserved;
 end;
 
 constructor TBlobCollectionItem.Create(aCollection: TBlobCollection);
@@ -470,6 +542,10 @@ begin
   inherited Destroy;
 end;
 
+initialization
+  Singleton:= nil;
+finalization
+  FreeAndNil(Singleton);
 end.
 
 
