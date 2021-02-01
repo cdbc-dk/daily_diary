@@ -96,7 +96,7 @@ end;
 function TfrmMain.test_tv: integer;
 var I: integer;
 begin
-  for I:= 0 to 14 do
+  for I:= 14 downto 0 do
   AddChildNodes(DateToStr(Date)+' '+I.ToString);
 end;
 
