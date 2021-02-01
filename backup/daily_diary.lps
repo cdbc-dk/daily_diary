@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectSession>
+    <Version Value="11"/>
+    <BuildModes Active="Default"/>
+    <Units Count="8">
+      <Unit0>
+        <Filename Value="daily_diary.lpr"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="-1"/>
+        <TopLine Value="-1"/>
+        <CursorPos X="-1" Y="-1"/>
+        <UsageCount Value="20"/>
+      </Unit0>
+      <Unit1>
+        <Filename Value="lfm_main.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="frmMain"/>
+        <ResourceBaseClass Value="Form"/>
+        <IsVisibleTab Value="True"/>
+        <TopLine Value="91"/>
+        <CursorPos X="22" Y="99"/>
+        <UsageCount Value="20"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
+      </Unit1>
+      <Unit2>
+        <Filename Value="const/daily_diary_const.pas"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="41" Y="3"/>
+        <UsageCount Value="20"/>
+      </Unit2>
+      <Unit3>
+        <Filename Value="global/daily_diary_const.pas"/>
+        <EditorIndex Value="4"/>
+        <TopLine Value="64"/>
+        <CursorPos X="45" Y="85"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit3>
+      <Unit4>
+        <Filename Value="/usr/share/fpcsrc/rtl/objpas/classes/classesh.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="100"/>
+        <CursorPos X="22" Y="101"/>
+        <UsageCount Value="10"/>
+      </Unit4>
+      <Unit5>
+        <Filename Value="/usr/lib64/lazarus/lcl/include/treeview.inc"/>
+        <EditorIndex Value="3"/>
+        <TopLine Value="4476"/>
+        <CursorPos Y="4487"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit5>
+      <Unit6>
+        <Filename Value="/usr/share/fpcsrc/rtl/objpas/sysutils/syshelph.inc"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="667"/>
+        <CursorPos X="30" Y="677"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit6>
+      <Unit7>
+        <Filename Value="/usr/share/fpcsrc/rtl/objpas/sysutils/syshelpo.inc"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="73"/>
+        <CursorPos X="3" Y="76"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit7>
+    </Units>
+    <JumpHistory Count="29" HistoryIndex="28">
+      <Position1>
+        <Filename Value="/usr/lib64/lazarus/lcl/include/treeview.inc"/>
+        <Caret Line="4506" TopLine="4499"/>
+      </Position1>
+      <Position2>
+        <Filename Value="/usr/lib64/lazarus/lcl/include/treeview.inc"/>
+        <Caret Line="4507" TopLine="4499"/>
+      </Position2>
+      <Position3>
+        <Filename Value="/usr/lib64/lazarus/lcl/include/treeview.inc"/>
+        <Caret Line="5458" TopLine="5451"/>
+      </Position3>
+      <Position4>
+        <Filename Value="/usr/lib64/lazarus/lcl/include/treeview.inc"/>
+        <Caret Line="5459" TopLine="5451"/>
+      </Position4>
+      <Position5>
+        <Filename Value="/usr/lib64/lazarus/lcl/include/treeview.inc"/>
+        <Caret Line="5460" TopLine="5451"/>
+      </Position5>
+      <Position6>
+        <Filename Value="/usr/lib64/lazarus/lcl/include/treeview.inc"/>
+        <Caret Line="4512" TopLine="4506"/>
+      </Position6>
+      <Position7>
+        <Filename Value="/usr/lib64/lazarus/lcl/include/treeview.inc"/>
+        <Caret Line="4513" TopLine="4506"/>
+      </Position7>
+      <Position8>
+        <Filename Value="/usr/lib64/lazarus/lcl/include/treeview.inc"/>
+        <Caret Line="4514" TopLine="4506"/>
+      </Position8>
+      <Position9>
+        <Filename Value="/usr/lib64/lazarus/lcl/include/treeview.inc"/>
+        <Caret Line="4515" TopLine="4506"/>
+      </Position9>
+      <Position10>
+        <Filename Value="/usr/lib64/lazarus/lcl/include/treeview.inc"/>
+        <Caret Line="4517" TopLine="4506"/>
+      </Position10>
+      <Position11>
+        <Filename Value="/usr/lib64/lazarus/lcl/include/treeview.inc"/>
+        <Caret Line="4519" TopLine="4513"/>
+      </Position11>
+      <Position12>
+        <Filename Value="/usr/lib64/lazarus/lcl/include/treeview.inc"/>
+        <Caret Line="4520" TopLine="4513"/>
+      </Position12>
+      <Position13>
+        <Filename Value="/usr/lib64/lazarus/lcl/include/treeview.inc"/>
+        <Caret Line="4522" TopLine="4513"/>
+      </Position13>
+      <Position14>
+        <Filename Value="/usr/lib64/lazarus/lcl/include/treeview.inc"/>
+        <Caret Line="4523" TopLine="4513"/>
+      </Position14>
+      <Position15>
+        <Filename Value="/usr/lib64/lazarus/lcl/include/treeview.inc"/>
+        <Caret Line="6360" TopLine="6353"/>
+      </Position15>
+      <Position16>
+        <Filename Value="/usr/lib64/lazarus/lcl/include/treeview.inc"/>
+        <Caret Line="6363" TopLine="6353"/>
+      </Position16>
+      <Position17>
+        <Filename Value="lfm_main.pas"/>
+        <Caret Line="69" TopLine="57"/>
+      </Position17>
+      <Position18>
+        <Filename Value="/usr/lib64/lazarus/lcl/include/treeview.inc"/>
+        <Caret Line="4483" TopLine="4476"/>
+      </Position18>
+      <Position19>
+        <Filename Value="/usr/lib64/lazarus/lcl/include/treeview.inc"/>
+        <Caret Line="4486" TopLine="4476"/>
+      </Position19>
+      <Position20>
+        <Filename Value="/usr/lib64/lazarus/lcl/include/treeview.inc"/>
+        <Caret Line="4487" TopLine="4476"/>
+      </Position20>
+      <Position21>
+        <Filename Value="lfm_main.pas"/>
+        <Caret Line="76" TopLine="70"/>
+      </Position21>
+      <Position22>
+        <Filename Value="lfm_main.pas"/>
+        <Caret Line="30" Column="26" TopLine="24"/>
+      </Position22>
+      <Position23>
+        <Filename Value="lfm_main.pas"/>
+        <Caret Line="74" Column="65" TopLine="69"/>
+      </Position23>
+      <Position24>
+        <Filename Value="lfm_main.pas"/>
+        <Caret Line="78" Column="13" TopLine="74"/>
+      </Position24>
+      <Position25>
+        <Filename Value="lfm_main.pas"/>
+        <Caret Line="30" Column="14" TopLine="24"/>
+      </Position25>
+      <Position26>
+        <Filename Value="lfm_main.pas"/>
+        <Caret Line="75" Column="45" TopLine="91"/>
+      </Position26>
+      <Position27>
+        <Filename Value="/usr/share/fpcsrc/rtl/objpas/sysutils/syshelph.inc"/>
+        <Caret Line="527" Column="14" TopLine="520"/>
+      </Position27>
+      <Position28>
+        <Filename Value="/usr/share/fpcsrc/rtl/objpas/sysutils/syshelpo.inc"/>
+        <Caret Line="76" Column="3" TopLine="73"/>
+      </Position28>
+      <Position29>
+        <Filename Value="/usr/share/fpcsrc/rtl/objpas/sysutils/syshelph.inc"/>
+        <Caret Line="402" Column="14" TopLine="260"/>
+      </Position29>
+    </JumpHistory>
+    <RunParams>
+      <FormatVersion Value="2"/>
+      <Modes Count="0" ActiveMode=""/>
+    </RunParams>
+  </ProjectSession>
+</CONFIG>
