@@ -7,12 +7,11 @@ interface
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ComCtrls, StdCtrls,
   ExtCtrls,
-  daily_diary_const;
+  daily_diary_const,
+  bom_dd;
 
 type
-
   { TfrmMain }
-
   TfrmMain = class(TForm)
     Button1: TButton;
     gbxControls: TGroupBox;
@@ -23,8 +22,10 @@ type
     stbInfo: TStatusBar;
     trvDates: TTreeView;
     procedure Button1Click(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
   protected
+    fBom: TDDCollection;
     fRootNode: TTreeNode;
     function AddChildNodes(const aDate: string): integer;  { flexible result, better than boolean }
     procedure DeleteDateNode;
@@ -47,14 +48,20 @@ begin
   { if there are no nodes, create a root node with a parent of nil }
   Caption:= MainTitle;                            { from daily_diary_const }
   if trvDates.Items.Count = 0 then begin       { create a parent root node }
-    fRootNode:= trvDates.Items.AddFirst(nil,'Dates');
+    fRootNode:= trvDates.Items.AddFirst(nil,'Dates:');
     fRootNode.Data:= nil;
   end;
+  fBom:= CreateBom; { create our business object model }
 end;
 
 procedure TfrmMain.Button1Click(Sender: TObject);
 begin
   test_tv;
+end;
+
+procedure TfrmMain.FormDestroy(Sender: TObject);
+begin
+  fBom:= nil; { just unlink, will be freed later }
 end;
 
 function TfrmMain.AddChildNodes(const aDate: string): integer;
@@ -96,7 +103,7 @@ end;
 function TfrmMain.test_tv: integer;
 var I: integer;
 begin
-  for I:= 0 to 14 do
+  for I:= 14 downto 0 do
   AddChildNodes(DateToStr(Date)+' '+I.ToString);
 end;
 

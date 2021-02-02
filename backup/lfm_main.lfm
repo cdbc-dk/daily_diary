@@ -6,6 +6,7 @@ object frmMain: TfrmMain
   Caption = 'Daily Diary'
   ClientHeight = 500
   ClientWidth = 800
+  OnDestroy = FormDestroy
   OnShow = FormShow
   LCLVersion = '2.0.10.0'
   object stbInfo: TStatusBar
@@ -40,47 +41,46 @@ object frmMain: TfrmMain
     Left = 0
     Height = 408
     Top = 73
-    Width = 185
+    Width = 200
     Align = alLeft
     Caption = ' Diary Dates '
     ClientHeight = 390
-    ClientWidth = 183
+    ClientWidth = 198
     TabOrder = 2
     object trvDates: TTreeView
       Left = 0
       Height = 390
       Top = 0
-      Width = 183
+      Width = 198
       Align = alClient
       BackgroundColor = clCream
       Color = clCream
       Font.Height = -19
-      Font.Style = [fsBold]
       ParentFont = False
       TabOrder = 0
     end
   end
   object Splitter1: TSplitter
-    Left = 185
+    Left = 200
     Height = 408
     Top = 73
     Width = 5
   end
   object gbxText: TGroupBox
-    Left = 190
+    Left = 205
     Height = 408
     Top = 73
-    Width = 610
+    Width = 595
     Align = alClient
     Caption = ' Diary Text '
     ClientHeight = 390
-    ClientWidth = 608
+    ClientWidth = 593
     TabOrder = 4
     object memText: TMemo
       Left = 0
       Height = 390
       Top = 0
-      Width = 608
+      Width = 593
       Align = alClient
       Color = clBlack
       Font.Color = clYellow

@@ -3,7 +3,7 @@
   <ProjectSession>
     <Version Value="11"/>
     <BuildModes Active="Default"/>
-    <Units Count="16">
+    <Units Count="19">
       <Unit0>
         <Filename Value="daily_diary.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -11,7 +11,7 @@
         <WindowIndex Value="-1"/>
         <TopLine Value="-1"/>
         <CursorPos X="-1" Y="-1"/>
-        <UsageCount Value="33"/>
+        <UsageCount Value="82"/>
       </Unit0>
       <Unit1>
         <Filename Value="lfm_main.pas"/>
@@ -19,8 +19,10 @@
         <ComponentName Value="frmMain"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <CursorPos X="42" Y="95"/>
-        <UsageCount Value="33"/>
+        <IsVisibleTab Value="True"/>
+        <TopLine Value="23"/>
+        <CursorPos X="25" Y="27"/>
+        <UsageCount Value="82"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit1>
@@ -29,64 +31,66 @@
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="41" Y="3"/>
-        <UsageCount Value="33"/>
+        <UsageCount Value="82"/>
       </Unit2>
       <Unit3>
-        <Filename Value="global/daily_diary_const.pas"/>
-        <EditorIndex Value="4"/>
-        <TopLine Value="13"/>
-        <CursorPos X="65" Y="20"/>
-        <UsageCount Value="16"/>
+        <Filename Value="bom/bom_dd.pas"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="85"/>
+        <CursorPos X="35" Y="92"/>
+        <UsageCount Value="82"/>
+        <Bookmarks Count="5">
+          <Item0 X="2" Y="225"/>
+          <Item1 X="71" Y="275" ID="1"/>
+          <Item2 X="2" Y="311" ID="2"/>
+          <Item3 X="2" Y="108" ID="3"/>
+          <Item4 X="29" Y="431" ID="4"/>
+        </Bookmarks>
         <Loaded Value="True"/>
       </Unit3>
       <Unit4>
-        <Filename Value="/usr/share/fpcsrc/rtl/objpas/classes/classesh.inc"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="491"/>
-        <CursorPos X="3" Y="483"/>
-        <UsageCount Value="9"/>
+        <Filename Value="global/daily_diary_const.pas"/>
+        <EditorIndex Value="5"/>
+        <CursorPos X="7" Y="12"/>
+        <UsageCount Value="40"/>
+        <Loaded Value="True"/>
       </Unit4>
       <Unit5>
+        <Filename Value="/usr/share/fpcsrc/rtl/objpas/classes/classesh.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="436"/>
+        <CursorPos X="21" Y="440"/>
+        <UsageCount Value="13"/>
+      </Unit5>
+      <Unit6>
         <Filename Value="/usr/lib64/lazarus/lcl/include/treeview.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="4527"/>
         <CursorPos Y="4487"/>
-        <UsageCount Value="9"/>
-      </Unit5>
-      <Unit6>
+        <UsageCount Value="4"/>
+      </Unit6>
+      <Unit7>
         <Filename Value="/usr/share/fpcsrc/rtl/objpas/sysutils/syshelph.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="667"/>
         <CursorPos X="30" Y="677"/>
-        <UsageCount Value="9"/>
-      </Unit6>
-      <Unit7>
+        <UsageCount Value="4"/>
+      </Unit7>
+      <Unit8>
         <Filename Value="/usr/share/fpcsrc/rtl/objpas/sysutils/syshelpo.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="73"/>
         <CursorPos X="3" Y="76"/>
-        <UsageCount Value="9"/>
-      </Unit7>
-      <Unit8>
+        <UsageCount Value="4"/>
+      </Unit8>
+      <Unit9>
         <Filename Value="../test_blob/bom/bom_blob.pas"/>
         <UnitName Value="__bom_blob"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="442"/>
+        <TopLine Value="105"/>
         <CursorPos X="30" Y="444"/>
-        <UsageCount Value="16"/>
-        <Loaded Value="True"/>
-      </Unit8>
-      <Unit9>
-        <Filename Value="bom/bom_dd.pas"/>
-        <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="2"/>
-        <TopLine Value="536"/>
-        <CursorPos Y="530"/>
-        <UsageCount Value="33"/>
-        <Bookmarks Count="1">
-          <Item0 X="2" Y="323"/>
-        </Bookmarks>
+        <UsageCount Value="40"/>
         <Loaded Value="True"/>
       </Unit9>
       <Unit10>
@@ -94,158 +98,182 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="133"/>
         <CursorPos X="3" Y="121"/>
-        <UsageCount Value="9"/>
+        <UsageCount Value="4"/>
       </Unit10>
       <Unit11>
         <Filename Value="global/dd_settings.pas"/>
-        <EditorIndex Value="3"/>
-        <TopLine Value="23"/>
-        <CursorPos X="14" Y="28"/>
-        <UsageCount Value="11"/>
-        <Loaded Value="True"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="34"/>
+        <UsageCount Value="35"/>
       </Unit11>
       <Unit12>
         <Filename Value="../../bc_rtl/bc_utilities.pas"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="90"/>
         <CursorPos X="3" Y="106"/>
-        <UsageCount Value="9"/>
+        <UsageCount Value="4"/>
       </Unit12>
       <Unit13>
         <Filename Value="/usr/share/fpcsrc/rtl/inc/objpash.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="199"/>
         <CursorPos X="23" Y="206"/>
-        <UsageCount Value="9"/>
+        <UsageCount Value="4"/>
       </Unit13>
       <Unit14>
         <Filename Value="/usr/share/fpcsrc/rtl/inc/objpas.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="329"/>
         <CursorPos X="9" Y="325"/>
-        <UsageCount Value="9"/>
+        <UsageCount Value="4"/>
       </Unit14>
       <Unit15>
         <Filename Value="../../bc_rtl/bc_datetime.pas"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="545"/>
-        <CursorPos X="3" Y="549"/>
-        <UsageCount Value="10"/>
+        <EditorIndex Value="3"/>
+        <TopLine Value="412"/>
+        <CursorPos X="3" Y="414"/>
+        <UsageCount Value="13"/>
+        <Loaded Value="True"/>
       </Unit15>
+      <Unit16>
+        <Filename Value="../../bc_rtl/bc_litedb.pas"/>
+        <EditorIndex Value="4"/>
+        <TopLine Value="170"/>
+        <CursorPos X="30" Y="179"/>
+        <UsageCount Value="34"/>
+        <Loaded Value="True"/>
+      </Unit16>
+      <Unit17>
+        <Filename Value="/usr/share/fpcsrc/rtl/objpas/classes/collect.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="314"/>
+        <CursorPos X="3" Y="319"/>
+        <UsageCount Value="10"/>
+      </Unit17>
+      <Unit18>
+        <Filename Value="/usr/share/fpcsrc/rtl/objpas/classes/persist.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="89"/>
+        <CursorPos X="4" Y="67"/>
+        <UsageCount Value="11"/>
+      </Unit18>
     </Units>
-    <JumpHistory Count="28" HistoryIndex="27">
+    <JumpHistory Count="29" HistoryIndex="28">
       <Position1>
-        <Filename Value="lfm_main.pas"/>
-        <Caret Line="69" TopLine="57"/>
+        <Filename Value="bom/bom_dd.pas"/>
+        <Caret Line="271" Column="49" TopLine="259"/>
       </Position1>
       <Position2>
-        <Filename Value="lfm_main.pas"/>
-        <Caret Line="76" TopLine="70"/>
+        <Filename Value="bom/bom_dd.pas"/>
+        <Caret Line="282" Column="71" TopLine="270"/>
       </Position2>
       <Position3>
-        <Filename Value="lfm_main.pas"/>
-        <Caret Line="30" Column="26" TopLine="24"/>
+        <Filename Value="bom/bom_dd.pas"/>
+        <Caret Line="351" Column="103" TopLine="339"/>
       </Position3>
       <Position4>
-        <Filename Value="lfm_main.pas"/>
-        <Caret Line="74" Column="65" TopLine="69"/>
+        <Filename Value="bom/bom_dd.pas"/>
+        <Caret Line="357" Column="5" TopLine="346"/>
       </Position4>
       <Position5>
-        <Filename Value="lfm_main.pas"/>
-        <Caret Line="78" Column="13" TopLine="74"/>
+        <Filename Value="bom/bom_dd.pas"/>
+        <Caret Line="447" Column="16" TopLine="436"/>
       </Position5>
       <Position6>
-        <Filename Value="lfm_main.pas"/>
-        <Caret Line="30" Column="14" TopLine="24"/>
+        <Filename Value="bom/bom_dd.pas"/>
+        <Caret Line="448" Column="16" TopLine="437"/>
       </Position6>
       <Position7>
-        <Filename Value="../test_blob/bom/bom_blob.pas"/>
-        <Caret Line="18" Column="24" TopLine="13"/>
+        <Filename Value="bom/bom_dd.pas"/>
+        <Caret Line="449" Column="16" TopLine="438"/>
       </Position7>
       <Position8>
-        <Filename Value="global/daily_diary_const.pas"/>
-        <Caret Line="16" Column="150" TopLine="13"/>
+        <Filename Value="bom/bom_dd.pas"/>
+        <Caret Line="456" Column="54" TopLine="444"/>
       </Position8>
       <Position9>
         <Filename Value="bom/bom_dd.pas"/>
-        <Caret Line="37" Column="22" TopLine="25"/>
+        <Caret Line="254" Column="71" TopLine="248"/>
       </Position9>
       <Position10>
         <Filename Value="bom/bom_dd.pas"/>
-        <Caret Line="108" Column="5" TopLine="106"/>
+        <Caret Line="282" Column="71"/>
       </Position10>
       <Position11>
         <Filename Value="bom/bom_dd.pas"/>
-        <Caret Line="37" Column="17" TopLine="32"/>
+        <Caret Line="178" TopLine="129"/>
       </Position11>
       <Position12>
-        <Filename Value="bom/bom_dd.pas"/>
-        <Caret Line="44" Column="29" TopLine="43"/>
+        <Filename Value="global/daily_diary_const.pas"/>
+        <Caret Line="12" Column="7"/>
       </Position12>
       <Position13>
         <Filename Value="bom/bom_dd.pas"/>
-        <Caret Line="54" Column="2" TopLine="51"/>
+        <Caret Line="303" Column="27" TopLine="296"/>
       </Position13>
       <Position14>
         <Filename Value="bom/bom_dd.pas"/>
-        <Caret Line="94" Column="30" TopLine="93"/>
+        <Caret Line="105" Column="27" TopLine="92"/>
       </Position14>
       <Position15>
         <Filename Value="bom/bom_dd.pas"/>
-        <Caret Line="100" TopLine="92"/>
+        <Caret Line="306" Column="2" TopLine="296"/>
       </Position15>
       <Position16>
         <Filename Value="bom/bom_dd.pas"/>
-        <Caret Line="477" TopLine="464"/>
+        <Caret Line="108" Column="2" TopLine="98"/>
       </Position16>
       <Position17>
         <Filename Value="bom/bom_dd.pas"/>
-        <Caret Line="298" Column="35" TopLine="289"/>
+        <Caret Line="417" Column="3" TopLine="410"/>
       </Position17>
       <Position18>
         <Filename Value="bom/bom_dd.pas"/>
-        <Caret Line="37" Column="21" TopLine="29"/>
+        <Caret Line="160" Column="25" TopLine="156"/>
       </Position18>
       <Position19>
         <Filename Value="bom/bom_dd.pas"/>
-        <Caret Line="118" TopLine="340"/>
+        <Caret Line="426" Column="30" TopLine="424"/>
       </Position19>
       <Position20>
         <Filename Value="bom/bom_dd.pas"/>
-        <Caret Line="75" Column="19" TopLine="71"/>
+        <Caret Line="108" Column="2" TopLine="154"/>
       </Position20>
       <Position21>
         <Filename Value="bom/bom_dd.pas"/>
-        <Caret Line="8" Column="29"/>
+        <Caret Line="286" Column="36" TopLine="277"/>
       </Position21>
       <Position22>
         <Filename Value="bom/bom_dd.pas"/>
-        <Caret Line="299" Column="54" TopLine="289"/>
+        <Caret Line="247" Column="36" TopLine="216"/>
       </Position22>
       <Position23>
-        <Filename Value="bom/bom_dd.pas"/>
-        <Caret Line="307" Column="26" TopLine="298"/>
+        <Filename Value="lfm_main.pas"/>
+        <Caret Line="95" Column="42" TopLine="82"/>
       </Position23>
       <Position24>
-        <Filename Value="bom/bom_dd.pas"/>
-        <Caret Line="323" Column="2" TopLine="314"/>
+        <Filename Value="lfm_main.pas"/>
+        <Caret Line="11" Column="9"/>
       </Position24>
       <Position25>
         <Filename Value="bom/bom_dd.pas"/>
-        <Caret TopLine="34"/>
       </Position25>
       <Position26>
         <Filename Value="bom/bom_dd.pas"/>
-        <Caret Line="389" Column="18" TopLine="383"/>
+        <Caret Line="69" Column="12" TopLine="57"/>
       </Position26>
       <Position27>
         <Filename Value="bom/bom_dd.pas"/>
-        <Caret Line="412" Column="21" TopLine="404"/>
+        <Caret Line="70" Column="23" TopLine="58"/>
       </Position27>
       <Position28>
         <Filename Value="bom/bom_dd.pas"/>
-        <Caret Line="422" Column="22" TopLine="417"/>
+        <Caret Line="72" Column="22" TopLine="61"/>
       </Position28>
+      <Position29>
+        <Filename Value="bom/bom_dd.pas"/>
+        <Caret Line="252" Column="3" TopLine="270"/>
+      </Position29>
     </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>
