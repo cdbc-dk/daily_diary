@@ -9,22 +9,22 @@ uses
 
 const
   MainTitle = 'Daily Diary';
-  Version = '0.28.01.2021-alfa';
+  UnitVersion = '0.01.02.2021-alfa';
   cdsQuit = -999;
   { sql statements }
   { create daily diary table }
   CreateDb = 'CREATE TABLE daily_diary(id_dd integer primary key, date_dd integer, weeknumber_dd integer, text_dd blob, reserved_dd varchar(512));';
   { insert in daily diary by parameters }
-  InsSql = 'INSERT INTO daily_diary(id_dd,date_dd,weeknumber_dd,text_dd,reserved_dd) VALUES(null,p:date,p:weekno,p:text,p:res);';
+  InsSql = 'INSERT INTO daily_diary(id_dd,date_dd,weeknumber_dd,text_dd,reserved_dd) VALUES(null,:pdate,:pweekno,:ptext,:pres);';
   { update daily diary table by parameters }
-  UpdSql = 'UPDATE daily_diary SET date_dd=p:date, weeknumber_dd=p:weekno, text_dd=p:text, reserved_dd=p:res WHERE id_dd=:pid;';
+  UpdSql = 'UPDATE daily_diary SET date_dd=:pdate, weeknumber_dd=:pweekno, text_dd=:ptext, reserved_dd=:pres WHERE id_dd=:pid;';
   { delete record from daily diary table by parameter }
   DelSql = 'DELETE FROM daily_diary WHERE id_dd=:pid;';
   { select all the records in daily diary table }
   SelSql = 'SELECT * FROM daily_diary;';
   { get a hold on the last inserted id }
   LastIdSql = 'SELECT LAST_INSERT_ROWID() AS id_Last;';
-// alternative: LastIdDdSql = 'SELECT id_dd FROM daily_diary;';
+  LastId_ddSql = 'SELECT id_dd FROM daily_diary;';
 
   { modification states }
   mNone    = 0;
@@ -81,6 +81,9 @@ begin
   end;
 end;
 
+(*
+  TLongBoolHelper = Type Helper for LongBool
+*)
 end.
 
 
