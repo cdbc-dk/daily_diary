@@ -1,6 +1,7 @@
 unit bom_dd;
 {$mode objfpc}{$H+}
 {$define debug}
+{$define id_dd}
 interface
 uses
   Classes, SysUtils, db,
@@ -34,8 +35,8 @@ type
   protected
     procedure AssignData(aSource: TDDCollectionItem); // nifty little feature
   public
-    constructor Create(aCollection: TDDCollection);
-    destructor Destroy;
+    constructor Create(aCollection: TDDCollection); override;
+    destructor Destroy; override;
     property Id_DD: ptruint read fId_DD write fId_DD;
     property Date: TIsoDate read fDate write fDate;
     property WeekNumber: ptruint read fWeekNumber write fWeekNumber;
@@ -202,16 +203,16 @@ begin
   while not fDeltaQueue.IsEmpty do begin
     Tmp:= fDeltaQueue.Dequeue;
     case Tmp.Modified of
-      mAdded: begin
-                New:= TDDCollectionItem(Add); { gets an ownership from collection }
-                AddRecord(Tmp);                      { persist in database }
-                New.AssignData(Tmp);           { copy data to the new item }
-              end;
-      mAltered: UpdateDb(false);             { persist changes in database }
-      mDelete: begin
-                 DeleteRecord(Tmp);  { takes care of the database back-end }
-                 DeleteItem(Tmp);   { removes the item from our collection }
-               end;
+      mAdded:   begin
+                  New:= TDDCollectionItem(Add); { gets an ownership from collection }
+                  AddRecord(Tmp);                      { persist in database }
+                  New.AssignData(Tmp);           { copy data to the new item }
+                end;
+      mAltered: UpdateDb(true);              { persist changes in database }
+      mDelete:  begin
+                  DeleteRecord(Tmp); { takes care of the database back-end }
+                  DeleteItem(Tmp);  { removes the item from our collection }
+                end;
     end;
     FreeAndNil(Tmp);
   end;
@@ -232,13 +233,24 @@ begin
       fDb.Query.ParamByName('ptext').LoadFromStream(anItem.Text,ftBlob);
       fDb.Query.ParamByName('pres').AsString:= anItem.Reserved;
       fDb.Query.ExecSQL;
-      { now get a hold of our last entry ID }
+      {$ifdef id_dd}
+      { now get a hold of our last entry Id_DD }
+      fDb.Query.Close;
+      fDb.Query.SQL.Text:= LastId_ddSql; { 'SELECT id_dd FROM daily_diary;' }
+      fDb.Query.Open;
+      fDb.Query.Last;
+      Result:= fDb.Query.FieldByName('id_dd').AsInteger;
+      anItem.Id_DD:= Result;
+      fDb.Query.Close;
+      {$else}
+      { now get a hold of our last db Id primary key }
       fDb.Query.Close;
       fDb.Query.SQL.Text:= LastIdSql; { 'SELECT LAST_INSERT_ROWID() AS Id_Last;' }
       fDb.Query.Open;
       Result:= fDb.Query.FieldByName('Id_Last').AsInteger;
       anItem.Id_DD:= Result;
       fDb.Query.Close;
+      {$endif}
       fDb.Transaction.Commit;
       anItem.Modified:= mNone;
     end;
@@ -428,7 +440,7 @@ begin
   { now sort the collection, according to user preference }
   case fSortOrder of
     0: Sort(@DDCompareDate); // sort by date
-    1: Sort(@DDDCompareWeekNo); // sort by date
+    1: Sort(@DDCompareWeekNo); // sort by weeknumber
   end;
   EndUpdate;
   if fDb.Connected then fDb.DisConnect;

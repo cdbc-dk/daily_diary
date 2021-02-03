@@ -24,7 +24,7 @@ const
   SelSql = 'SELECT * FROM daily_diary;';
   { get a hold on the last inserted id }
   LastIdSql = 'SELECT LAST_INSERT_ROWID() AS id_Last;';
-// alternative: LastIdDdSql = 'SELECT id_dd FROM daily_diary;';
+  LastId_ddSql = 'SELECT id_dd FROM daily_diary;';
 
   { modification states }
   mNone    = 0;

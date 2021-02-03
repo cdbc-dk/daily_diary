@@ -6,31 +6,76 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ComCtrls, StdCtrls,
-  ExtCtrls,
+  ExtCtrls, ExtDlgs, Buttons,
   daily_diary_const,
-  bom_dd;
+  bom_dd,
+  bc_datetime;
+
+(*
+{*** THKObserver ***}
+THKObserver = class(TInterfacedObject,IFPObserver)
+private
+  fDs: THKCollection;
+  fGrid: TStringGrid;
+public
+  constructor Create(aGrid: TStringGrid);
+  procedure ClearGrid;
+  procedure CreateGridHeaders;
+  procedure PopulateGrid;
+  Procedure FPOObservedChanged(ASender : TObject; Operation : TFPObservedOperation; Data : Pointer);
+end;
+*)
+
+
 
 type
+  { *** tddobserver *** }
+
+  { TDDObserver }
+
+  TDDObserver = class(TInterfacedObject,IFPObserver)
+  protected
+    fTreeView: TTreeView;
+    fMemo: TMemo;
+  public
+    constructor Create(const aTreeview: TTreeView;
+                       const aMemo: TMemo);
+    destructor Destroy; override;
+    Procedure FPOObservedChanged(aSender: TObject;Operation: TFPObservedOperation;Data: Pointer);
+  end;
+
   { TfrmMain }
   TfrmMain = class(TForm)
     Button1: TButton;
+    btnCalender: TButton;
+    dlgCalender: TCalendarDialog;
     gbxControls: TGroupBox;
     gbxDates: TGroupBox;
     gbxText: TGroupBox;
+    edtDate: TLabeledEdit;
+    imglAll: TImageList;
     memText: TMemo;
+    btnAdd: TSpeedButton;
+    btnDelete: TSpeedButton;
+    btnSave: TSpeedButton;
+    btnEdit: TSpeedButton;
     Splitter1: TSplitter;
     stbInfo: TStatusBar;
     trvDates: TTreeView;
+    procedure btnCalenderClick(Sender: TObject);
     procedure Button1Click(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
   protected
     fBom: TDDCollection;
     fRootNode: TTreeNode;
+
+    fDate: TIsoDate;
     function AddChildNodes(const aDate: string): integer;  { flexible result, better than boolean }
     procedure DeleteDateNode;
   public
     function test_tv: integer;
+
   end;
 
 var
@@ -40,8 +85,36 @@ implementation
 
 {$R *.lfm}
 
-{ TfrmMain }
+{ *** TDDObserver *** }
+constructor TDDObserver.Create(const aTreeview: TTreeView; const aMemo: TMemo);
+begin
+  inherited Create;
+  fTreeView:= aTreeview
+  fMemo:= aMemo;
+end;
 
+destructor TDDObserver.Destroy;
+begin
+  fTreeView:= nil;
+  fMemo:= nil;
+  inherited Destroy;
+end;
+
+procedure TDDObserver.FPOObservedChanged(aSender: TObject;
+                                         Operation: TFPObservedOperation;
+                                         Data: Pointer);
+begin
+  case Operation of
+    ooAddItem: ;
+    ooChange: ;
+    ooDeleteItem;
+    ooFree: ;
+    ooCustom: ;
+  end;
+end;
+
+{ TfrmMain }
+{ implements the observed, so we have to roll our own observer }
 procedure TfrmMain.FormShow(Sender: TObject);
 begin
 //  trvDates.Items.Add(nil,'Root');
@@ -51,7 +124,8 @@ begin
     fRootNode:= trvDates.Items.AddFirst(nil,'Dates:');
     fRootNode.Data:= nil;
   end;
-  fBom:= CreateBom; { create our business object model }
+  fBom:= CreateBom;                     { create our business object model }
+  fDate:= TIsoDate.Create(now);
 end;
 
 procedure TfrmMain.Button1Click(Sender: TObject);
@@ -59,9 +133,23 @@ begin
   test_tv;
 end;
 
+procedure TfrmMain.btnCalenderClick(Sender: TObject);
+begin
+  dlgCalender.Date:= now;
+  if dlgCalender.Execute then begin
+    fDate.AsDate:= dlgCalender.Date;
+    edtDate.Text:= fDate.AsString;
+    memText.Lines.Add(fDate.AsString);
+    memText.Lines.Add(DateToStr(fDate.AsDate));
+    memText.Lines.Add(fDate.AsInteger.ToString);
+    memText.Lines.Add('Weeknumber: '+fDate.ISOWeekNumber.ToString);
+  end;
+end;
+
 procedure TfrmMain.FormDestroy(Sender: TObject);
 begin
   fBom:= nil; { just unlink, will be freed later }
+  FreeAndNil(fDate);
 end;
 
 function TfrmMain.AddChildNodes(const aDate: string): integer;

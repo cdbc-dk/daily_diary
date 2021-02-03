@@ -9,7 +9,7 @@ uses
 
 const
   MainTitle = 'Daily Diary';
-  Version = '0.01.02.2021-alfa';
+  UnitVersion = '0.01.02.2021-alfa';
   cdsQuit = -999;
   { sql statements }
   { create daily diary table }
@@ -24,7 +24,7 @@ const
   SelSql = 'SELECT * FROM daily_diary;';
   { get a hold on the last inserted id }
   LastIdSql = 'SELECT LAST_INSERT_ROWID() AS id_Last;';
-// alternative: LastIdDdSql = 'SELECT id_dd FROM daily_diary;';
+  LastId_dddSql = 'SELECT id_dd FROM daily_diary;';
 
   { modification states }
   mNone    = 0;
