@@ -106,6 +106,14 @@ object frmMain: TfrmMain
       ShowHint = True
       ParentShowHint = False
     end
+    object Edit1: TEdit
+      Left = 344
+      Height = 29
+      Top = 0
+      Width = 80
+      TabOrder = 3
+      Text = 'Edit1'
+    end
   end
   object gbxDates: TGroupBox
     Left = 0

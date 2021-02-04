@@ -89,7 +89,7 @@ implementation
 constructor TDDObserver.Create(const aTreeview: TTreeView; const aMemo: TMemo);
 begin
   inherited Create;
-  fTreeView:= aTreeview
+  fTreeView:= aTreeview;
   fMemo:= aMemo;
 end;
 

@@ -49,6 +49,7 @@ type
     Button1: TButton;
     btnCalender: TButton;
     dlgCalender: TCalendarDialog;
+    Edit1: TEdit;
     gbxControls: TGroupBox;
     gbxDates: TGroupBox;
     gbxText: TGroupBox;
@@ -89,7 +90,7 @@ implementation
 constructor TDDObserver.Create(const aTreeview: TTreeView; const aMemo: TMemo);
 begin
   inherited Create;
-  fTreeView:= aTreeview
+  fTreeView:= aTreeview;
   fMemo:= aMemo;
 end;
 
@@ -105,11 +106,11 @@ procedure TDDObserver.FPOObservedChanged(aSender: TObject;
                                          Data: Pointer);
 begin
   case Operation of
-    ooAddItem: ;
-    ooChange: ;
-    ooDeleteItem;
-    ooFree: ;
-    ooCustom: ;
+    ooAddItem   : ;
+    ooChange    : ;
+    ooDeleteItem: ;
+    ooFree      : ;
+    ooCustom    : ;
   end;
 end;
 
