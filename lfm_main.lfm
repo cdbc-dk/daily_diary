@@ -6,6 +6,7 @@ object frmMain: TfrmMain
   Caption = 'Daily Diary'
   ClientHeight = 500
   ClientWidth = 800
+  OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnShow = FormShow
   LCLVersion = '2.0.10.0'
@@ -70,6 +71,7 @@ object frmMain: TfrmMain
       Width = 23
       Images = imglAll
       ImageIndex = 6
+      OnClick = btnAddClick
       ShowHint = True
       ParentShowHint = False
     end
@@ -103,8 +105,17 @@ object frmMain: TfrmMain
       Width = 23
       Images = imglAll
       ImageIndex = 9
+      OnClick = btnEditClick
       ShowHint = True
       ParentShowHint = False
+    end
+    object lblActions: TLabel
+      Left = 152
+      Height = 17
+      Top = 0
+      Width = 55
+      Caption = 'Actions:'
+      ParentColor = False
     end
   end
   object gbxDates: TGroupBox

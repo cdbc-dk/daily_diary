@@ -5,12 +5,14 @@ unit bom_dd;
 interface
 uses
   Classes, SysUtils, db,
+  dialogs,
   bc_utilities,
   dd_settings,
   daily_diary_const,
   bc_datetime,
   bc_mtlinklist,
-  bc_litedb;
+  bc_litedb,
+  bc_observer;
 type
   { TNamedMemorystream }
   TNamedMemorystream = class(TMemoryStream)
@@ -21,7 +23,7 @@ type
     property Name: string read fName write fName;
   end;
 
-  TDDCollection = class;
+  TDDCollection = class; { forward declaration }
   { *** TDDCollectionItem *** }
   TDDCollectionItem = class(TCollectionItem)
   private
@@ -35,7 +37,7 @@ type
   protected
     procedure AssignData(aSource: TDDCollectionItem); // nifty little feature
   public
-    constructor Create(aCollection: TDDCollection); override;
+    constructor Create(aCollection: TDDCollection);
     destructor Destroy; override;
     property Id_DD: ptruint read fId_DD write fId_DD;
     property Date: TIsoDate read fDate write fDate;
@@ -45,6 +47,8 @@ type
     property Reserved: string read fReserved write fReserved;
     property Modified: byte read fModified write fModified;
   end; { TDDCollectionItem }
+
+  TDDCollectionItemClass = class of TDDCollectionItem;
 
   { *** TDDQueue *** }
   TDDQueue = class(TbcQueue)
@@ -60,6 +64,7 @@ type
   private
     fBatch: boolean;
     fSortOrder: integer;
+    fDDItemClass: TDDCollectionItemClass;
     function get_DbName: string;
     function get_EngineVersion: string;
     procedure set_DbName(aValue: string);
@@ -68,20 +73,30 @@ type
     fDb: TLiteDb;
     fDeltaQueue: TDDQueue;
     fUpdateCount: ptrint;
+    { fObserved standalone }
+    fObserved: TObserved;
+//    fObservers: TFPList;
     procedure DoUpdate; { refactored 29.07.2015 bc }
     function AddRecord(anItem: TDDCollectionItem): ptruint; // result is the new ID for the current record
     procedure UpdateRecord(anItem: TDDCollectionItem);
     procedure DeleteRecord(anItem: TDDCollectionItem); { remove from database backend }
   public
-    constructor Create(anItemClass: TCollectionItemClass);
+    constructor Create(anItemClass: TDDCollectionItemClass);
     destructor Destroy; override;
     function CheckTable: boolean; { creates a new table in db-file }
+    function Add_Dd: TDDCollectionItem;
     function AddNew: TDDCollectionItem;
     procedure BackupDb; { 19.04.2015 bc }
     procedure AppendToDelta(anItem: TDDCollectionItem); { api }
+    function GetItemFromID(const anId: ptruint): TDDCollectionItem;
     function IndexOf(anItem: TDDCollectionItem): ptrint; { 11.05.2015 bc, returns -1 on not found else collection ID }
     function UpdateDb(const UpdateNow: boolean): boolean; { refactored 29.07.2015 bc }
     function ReadDb: boolean;
+    function ReadBlobDb(const Asc: boolean): boolean;
+    { test }
+    property Observed: TObserved read fObserved; // ææ
+    { test end }
+    property DDItemClass: TDDCollectionItemClass read fDDItemClass write fDDItemClass;
     property UpdateCount: ptrint read fUpdateCount write fUpdateCount;
     property DbName: string read get_DbName write set_DbName;
     property BatchUpdate: boolean read fBatch write fBatch;
@@ -107,7 +122,7 @@ end;
 procedure TDDCollectionItem.AssignData(aSource: TDDCollectionItem);
 begin
   fId_DD:= aSource.Id_DD;           // id from database
-  fDate:= aSource.Date;             // well duh!
+  fDate.AsInteger:= aSource.Date.AsInteger; // only copy data, NOT pointers
   fWeekNumber:= aSource.WeekNumber; // week number
   aSource.Text.Position:= 0;        // reset to beginning of stream
   fText.Position:= 0;               // reset to beginning of stream
@@ -196,6 +211,12 @@ begin
   try fDb.RunSQL(daily_diary_const.CreateDb); except  end;
 end;
 
+function TDDCollection.Add_Dd: TDDCollectionItem;
+begin
+  Result:= fDDItemClass.Create(Self);
+end;
+
+{ updates the database according to the modified state }
 procedure TDDCollection.DoUpdate; { refactored 29.07.2015 bc }
 var
   Tmp,New: TDDCollectionItem;
@@ -204,16 +225,20 @@ begin
     Tmp:= fDeltaQueue.Dequeue;
     case Tmp.Modified of
       mAdded:   begin
-                  New:= TDDCollectionItem(Add); { gets an ownership from collection }
-                  AddRecord(Tmp);                      { persist in database }
-                  New.AssignData(Tmp);           { copy data to the new item }
+                  New:= Add_Dd;        { gets an ownership from collection }
+                  AddRecord(Tmp);                    { persist in database }
+                  New.AssignData(Tmp);         { copy data to the new item }
+                  { test }
+//                  Observed.FPONotifyObservers(Observed.Subject,ooAddItem,pointer(Tmp));
+                  Observed.FPONotifyObservers(Observed.Subject,ooAddItem,pointer(New));
+                  { test end }
                 end;
       mAltered: UpdateDb(true);              { persist changes in database }
       mDelete:  begin
                   DeleteRecord(Tmp); { takes care of the database back-end }
                   DeleteItem(Tmp);  { removes the item from our collection }
                 end;
-    end;
+    end; { end case }
     FreeAndNil(Tmp);
   end;
 end;
@@ -221,7 +246,7 @@ end;
 { addrecord persists anitem to database and returns the new row_id as a result }
 function TDDCollection.AddRecord(anItem: TDDCollectionItem): ptruint;
 begin
-  if fDb.Connect then begin                  { connect checks for connected }
+  if fDb.Connect then try                  { connect checks for connected }
     if not fDb.Transaction.Active then begin
       fDb.Transaction.StartTransaction;
       fDb.Query.Close;
@@ -254,9 +279,8 @@ begin
       fDb.Transaction.Commit;
       anItem.Modified:= mNone;
     end;
-    fDb.DisConnect;                               { no dangling connections }
-  end;
-  FPONotifyObservers(Self,ooAddItem,pointer(anItem));
+    fDb.DisConnect;                              { no dangling connections }
+  except on E:Exception do Showmessage('Error in addrecord '+E.Message); end;
 end;
 
 procedure TDDCollection.UpdateRecord(anItem: TDDCollectionItem);
@@ -280,7 +304,7 @@ begin
     fDb.DisConnect;                              { no dangling connections }
   end;
   { fpc built-in observer pattern }
-  FPONotifyObservers(Self,ooChange,pointer(anItem));
+//  FPONotifyObservers(Self,ooChange,pointer(anItem));
 end;
 
 procedure TDDCollection.DeleteRecord(anItem: TDDCollectionItem); { ok }
@@ -299,12 +323,13 @@ begin
   end;
 //  DeleteItem(anItem);                    { delete item from our collection }
   { fpc built-in observer pattern }
-  FPONotifyObservers(Self,ooDeleteItem,pointer(anItem));
+//  FPONotifyObservers(Self,ooDeleteItem,pointer(anItem));
 end;
 
-constructor TDDCollection.Create(anItemClass: TCollectionItemClass); { ok }
+constructor TDDCollection.Create(anItemClass: TDDCollectionItemClass); { ok }
 begin
   inherited Create(anItemClass);                { get our collection going }
+  fDDItemClass:= anItemClass;
   fDb:= TLiteDb.Create;                       { create our database engine }
   fDb.DbName:= DDSettings.Databasename;                   { 02.02.2021 /bc }
   fDb.Connect;        { connect to our database, if nonexisting create one }
@@ -314,6 +339,9 @@ begin
   fBatch:= false;
   fBatch:= DDSettings.BatchUpdates;                       { 19.04.2015 /bc }
   fUpdateCount:= DDSettings.BatchCount;                   { 19.04.2015 /bc }
+  { test }
+  fObserved:= TObserved.Create(Self);
+  { test end }
 end;
 
 destructor TDDCollection.Destroy;
@@ -322,6 +350,9 @@ begin
   fDeltaQueue.Free;
   if fDb.Connected then fDb.DisConnect;
   fDb.Free;
+  { test }
+  FreeAndNil(fObserved);
+  { test end }
   inherited Destroy;
 end;
 
@@ -386,6 +417,20 @@ begin
   end;
 end;
 
+function TDDCollection.GetItemFromID(const anId: ptruint): TDDCollectionItem;
+var
+  Idx: ptruint;
+begin
+  Result:= nil;
+  { perform a linear search }
+  for Idx:= 0 to Self.Count-1 do begin
+    if TDDCollectionItem(Self.Items[Idx]).Id_DD = anId then begin
+      Result:= TDDCollectionItem(Self.Items[Idx]);
+      break;
+    end;
+  end;
+end;
+
 function TDDCollection.IndexOf(anItem: TDDCollectionItem): ptrint; { ok }
 var
   Idx: longint;
@@ -403,7 +448,7 @@ begin
 end;
 
 function TDDCollection.UpdateDb(const UpdateNow: boolean): boolean; { ok }// db writes
-begin { original code moved to "cutaway.txt" }
+begin
   Result:= false;
   if not fDb.Connected then fDb.Connect;
   if not UpdateNow then begin { cater for batch updates }
@@ -444,8 +489,29 @@ begin
   end;
   EndUpdate;
   if fDb.Connected then fDb.DisConnect;
-  FPONotifyObservers(Self,ooCustom,pointer(Self.Count)); { fpc built-in observer pattern }
+//  FPONotifyObservers(Self,ooCustom,pointer(Self.Count)); { fpc built-in observer pattern }
 end;
+
+function TDDCollection.ReadBlobDb: boolean;
+begin
+  // TODO
+end;
+
+{ homegrown } (*
+procedure TDDCollection.FPONotifyObservers(ASender: TObject;
+                                           AOperation: TFPObservedOperation;
+                                           Data: Pointer);
+var
+  I: integer;
+  Obs: IFPObserver;
+begin
+  if assigned(FObservers) then
+    for I:=FObservers.Count-1 downto 0 do begin
+      Obs:=IFPObserver(FObservers[i]);
+      Obs.FPOObservedChanged(Self,AOperation,Data);
+    end;
+end;
+*)
 
 constructor TDDCollectionItem.Create(aCollection: TDDCollection);
 begin

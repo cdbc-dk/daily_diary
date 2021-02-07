@@ -21,7 +21,8 @@ const
   { delete record from daily diary table by parameter }
   DelSql = 'DELETE FROM daily_diary WHERE id_dd=:pid;';
   { select all the records in daily diary table }
-  SelSql = 'SELECT * FROM daily_diary;';
+  SelSqlAsc = 'SELECT * FROM daily_diary ORDER BY date_dd ASC;';
+  SelSqlDesc = 'SELECT * FROM daily_diary ORDER BY date_dd DESC;';
   { get a hold on the last inserted id }
   LastIdSql = 'SELECT LAST_INSERT_ROWID() AS id_Last;';
   LastId_ddSql = 'SELECT id_dd FROM daily_diary;';
@@ -53,6 +54,10 @@ const
   { function result codes }
   HR_OK    = 0;
   HR_ERROR = 1;
+
+type
+  { utility }
+  PInteger = ^integer;
 
 function DD_Databasename: string;
 function DD_Inifilename: string;

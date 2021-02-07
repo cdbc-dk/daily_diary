@@ -9,30 +9,29 @@ uses
   ExtCtrls, ExtDlgs, Buttons,
   daily_diary_const,
   bom_dd,
-  bc_datetime;
+  bc_datetime,
+  bc_observer;
 
 (*
-{*** THKObserver ***}
-THKObserver = class(TInterfacedObject,IFPObserver)
-private
-  fDs: THKCollection;
-  fGrid: TStringGrid;
-public
-  constructor Create(aGrid: TStringGrid);
-  procedure ClearGrid;
-  procedure CreateGridHeaders;
-  procedure PopulateGrid;
-  Procedure FPOObservedChanged(ASender : TObject; Operation : TFPObservedOperation; Data : Pointer);
-end;
+
+
 *)
 
 
 
 type
-  { *** tddobserver *** }
-
+  TObjectClass = class of TObject;
+  {*** TDD_Observer ***}
+  TDD_Observer = class(TObserver)
+  protected
+    fOwner: TObject;
+  public
+    constructor Create(const anOwner: TObject;const aClass: TObjectClass);
+    destructor Destroy; override;
+    Procedure FPOObservedChanged(ASender : TObject; Operation : TFPObservedOperation; Data : Pointer); override;
+  end;
   { TDDObserver }
-
+  {$interfaces corba}
   TDDObserver = class(TInterfacedObject,IFPObserver)
   protected
     fTreeView: TTreeView;
@@ -54,6 +53,7 @@ type
     gbxText: TGroupBox;
     edtDate: TLabeledEdit;
     imglAll: TImageList;
+    lblActions: TLabel;
     memText: TMemo;
     btnAdd: TSpeedButton;
     btnDelete: TSpeedButton;
@@ -62,20 +62,24 @@ type
     Splitter1: TSplitter;
     stbInfo: TStatusBar;
     trvDates: TTreeView;
+    procedure btnAddClick(Sender: TObject);
     procedure btnCalenderClick(Sender: TObject);
+    procedure btnEditClick(Sender: TObject);
     procedure Button1Click(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
   protected
     fBom: TDDCollection;
     fRootNode: TTreeNode;
-
+    fObserver: TDD_Observer;
     fDate: TIsoDate;
+    function AddEntryToTreeView(const anEntry: TDDCollectionItem): integer;
     function AddChildNodes(const aDate: string): integer;  { flexible result, better than boolean }
     procedure DeleteDateNode;
   public
     function test_tv: integer;
-
+    property Observer: TDD_Observer read fObserver;
   end;
 
 var
@@ -84,6 +88,30 @@ var
 implementation
 
 {$R *.lfm}
+
+{ TDD_Observer }
+
+procedure TDD_Observer.FPOObservedChanged(ASender: TObject;
+                                          Operation: TFPObservedOperation;
+                                          Data: Pointer);
+var
+  ddEntry: TDDCollectionItem;
+  mText: TMemo;
+begin
+  ddEntry:= TDDCollectionItem(Data);
+  mText:= TMemo(Self.ActiveObject);
+//  inherited FPOObservedChanged(ASender, Operation, Data);
+  case Operation of
+    ooAddItem: begin
+                 AddEntryToTreeView();
+                 mText.Lines.Add('< AddItem received... >');
+                 mText.Lines.Add(ddEntry.Date.AsString+' '+
+                                 ddEntry.WeekNumber.ToString+' '+
+                                 'Text'+' '+
+                                 ddEntry.Reserved);
+               end;
+  end;
+end;
 
 { *** TDDObserver *** }
 constructor TDDObserver.Create(const aTreeview: TTreeView; const aMemo: TMemo);
@@ -103,9 +131,26 @@ end;
 procedure TDDObserver.FPOObservedChanged(aSender: TObject;
                                          Operation: TFPObservedOperation;
                                          Data: Pointer);
+var
+  ddCollection: bom_dd.TDDCollection;
+  ddItem: bom_dd.TDDCollectionItem;
+  lId_DD: integer;
 begin
+  ddCollection:= nil;
+  ddItem:= nil;
+  ddItem:= TDDCollectionItem(Data);
+//  lId_DD:= integer(Data);
+  ddCollection:= TDDCollection(aSender);
+
+//  ddItem:= fbom.GetItemFromID();
+//  ddItem:= bom_dd.TDDCollectionItem(Data);
   case Operation of
-    ooAddItem   : ;
+    ooAddItem   : begin
+                    fMemo.Lines.Add(ddItem.Date.AsString+' '+
+                                    ddItem.WeekNumber.ToString+' '+
+                                    'Text'+' '+
+                                    ddItem.Reserved);
+                  end;
     ooChange    : ;
     ooDeleteItem: ;
     ooFree      : ;
@@ -124,13 +169,26 @@ begin
     fRootNode:= trvDates.Items.AddFirst(nil,'Dates:');
     fRootNode.Data:= nil;
   end;
-  fBom:= CreateBom;                     { create our business object model }
-  fDate:= TIsoDate.Create(now);
+//  fObserver:= TDDObserver.Create(trvDates,memText);
+//  fBom.FPOAttachObserver(fObserver);
+end;
+
+function TfrmMain.AddEntryToTreeView(const anEntry: TDDCollectionItem): integer;
+begin
+
 end;
 
 procedure TfrmMain.Button1Click(Sender: TObject);
 begin
   test_tv;
+end;
+
+procedure TfrmMain.FormCreate(Sender: TObject);
+begin
+  fBom:= CreateBom;                     { create our business object model }
+  fDate:= TIsoDate.Create(now);
+  fObserver:= TDD_Observer.Create(memText);
+  fBom.Observed.FPOAttachObserver(fObserver);
 end;
 
 procedure TfrmMain.btnCalenderClick(Sender: TObject);
@@ -146,15 +204,35 @@ begin
   end;
 end;
 
+procedure TfrmMain.btnEditClick(Sender: TObject);
+begin
+  // TODO
+end;
+
+procedure TfrmMain.btnAddClick(Sender: TObject);
+var
+  ddItem: TDDCollectionItem;
+begin
+  ddItem:= fbom.AddNew;
+  ddItem.Date.AsDate:= dlgCalender.Date;
+  ddItem.WeekNumber:= ddItem.Date.ISOWeekNumber;
+  ddItem.Text.Position:= 0;
+  memText.Lines.SaveToStream(ddItem.Text);
+  ddItem.Reserved:= 'Test driving... 03';
+  ddItem.Modified:= mAdded; { add to database }
+  fBom.AppendToDelta(ddItem);
+end;
+
 procedure TfrmMain.FormDestroy(Sender: TObject);
 begin
+//  fBom.FPODetachObserver(fObserver);
+  fBom.Observed.FPODetachObserver(fObserver);
+  FreeAndNil(fObserver);
   fBom:= nil; { just unlink, will be freed later }
   FreeAndNil(fDate);
 end;
 
 function TfrmMain.AddChildNodes(const aDate: string): integer;
-var
-  I: integer;
 begin
   Result:= HR_ERROR;                           { initialize to error state }
   try
