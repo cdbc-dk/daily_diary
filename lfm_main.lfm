@@ -83,6 +83,7 @@ object frmMain: TfrmMain
       Width = 23
       Images = imglAll
       ImageIndex = 8
+      OnClick = btnDeleteClick
       ShowHint = True
       ParentShowHint = False
     end
