@@ -33,7 +33,7 @@ const
   mAltered = 5;
   mDelete  = 7;
 
-  GridHeaders: array[1..5]of string = ('Date','Weeknumber','Text','Reserved');
+  GridHeaders: array[1..5]of string = ('Date','Date as string','Weeknumber','Text','Reserved');
   BooleanText: array[boolean] of string = ('No','Yes');
 
   { keyboard codes }
@@ -52,8 +52,8 @@ const
   DlgNo = 7;
 
   { function result codes }
-  HR_OK    = 0;
-  HR_ERROR = 1;
+  HRHR_OK    = 0;
+  HRHR_ERROR = 1;
 
 type
   { utility }

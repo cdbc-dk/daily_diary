@@ -31,7 +31,7 @@ type
   public
     constructor Create(const anOwner: TObject);
     destructor Destroy; override;
-    Procedure FPOObservedChanged(ASender : TObject; Operation : TFPObservedOperation; Data : Pointer); override;
+    Procedure FPOObservedChanged(ASender: TObject;Operation: TFPObservedOperation;Data: Pointer); override;
   end;
 
   { TfrmMain }
@@ -71,6 +71,7 @@ type
     function AddEntryToTreeView(const anEntry: TDDCollectionItem): integer;
     function AddChildNodes(const aDate: string): integer;  { flexible result, better than boolean }
     procedure DeleteDateNode;
+    function ClearTreeview: integer;
   public
     function DbRead: boolean;
     function test_tv: integer;
@@ -104,20 +105,20 @@ procedure TDD_Observer.FPOObservedChanged(ASender: TObject;
 var
   ddEntry: TDDCollectionItem;
   ddCollection: TDDCollection;
-  mText: TMemo;
+  ddform: TfrmMain;
 begin
-  mText:= TMemo(Self.fOwner);
+  ddform:= TfrmMain(fOwner);
 //  inherited FPOObservedChanged(ASender, Operation, Data);
   case Operation of
     ooAddItem:    begin
                     ddEntry:= TDDCollectionItem(Data);
   //                 AddEntryToTreeView();
-                    mText.Lines.Add('< AddItem received... >');
-                    mText.Lines.Add(ddEntry.Date.AsString+' | '+
-                                    ddEntry.DateStr+' | '+
-                                    ddEntry.WeekNumber.ToString+' | '+
-                                    'Text'+' | '+
-                                    ddEntry.Reserved);
+                    ddform.memText.Lines.Add('< AddItem received... >');
+                    ddform.memText.Lines.Add(ddEntry.Date.AsString+' | '+
+                                             ddEntry.DateStr+' | '+
+                                             ddEntry.WeekNumber.ToString+' | '+
+                                             'Text'+' | '+
+                                             ddEntry.Reserved);
                   end;
     ooChange:     begin
                     // TODO
@@ -128,7 +129,7 @@ begin
     ooCustom:     begin                             { dataset read from db }
                     ddCollection:= TDDCollection(aSender);
                     if ddCollection.Count > 0 then
-                      frmMain.AddWeekNodes(ddCollection);
+                      ddform.AddWeekNodes(ddCollection);
                   end;
   end;
 end;
@@ -137,16 +138,16 @@ end;
 { implements the observed, so we have to roll our own observer }
 procedure TfrmMain.FormShow(Sender: TObject); { ok }
 begin
-//  trvDates.Items.Add(nil,'Root');
-  { if there are no nodes, create a root node with a parent of nil }
+          { if there are no nodes, create a root node with a parent of nil }
   Caption:= MainTitle;                            { from daily_diary_const }
-  AddRootNode;                                    { get the treeview going }
+  AddRootNode;       { get the treeview going, DO NOT MESS WITH ROOT-NODE! }
 end;
 
 procedure TfrmMain.AddRootNode; { ok }
 begin
   if trvDates.Items.Count = 0 then begin       { create a parent root node }
     fRootNode:= trvDates.Items.AddFirst(nil,'Dates:');
+    fRootNode.Selected:= true;  { make sure that our root-node is selected }
     fRootNode.Data:= nil;
   end;
 end;
@@ -155,15 +156,18 @@ procedure TfrmMain.AddWeekNodes(aCollection: TDDCollection);
 var
   Idx: ptruint;
   ddItem: TDDCollectionItem;
+  ChildNode: TTreeNode;
 begin
   try
     if trvDates.Selected = nil then begin
       trvDates.select(fRootNode);     { make sure the rootnode is selected }
     end;
+    ClearTreeview;              { clears the treeview except the root node }
     for Idx:= 0 to aCollection.Count-1 do begin
       { add childnodes under the parent node (frootnode) }
-      ddItem:= TDDCollectionItem(fBom.Items[Idx]);
-      trvDates.Items.AddChild(fRootNode, ddItem.WeekNumber.ToString); // try with fixed root
+      ddItem:= TDDCollectionItem(aCollection.Items[Idx]);
+      ChildNode:= trvDates.Items.AddChild(fRootNode, ddItem.WeekNumber.ToString); // try with fixed root
+      ChildNode.Data:= Pointer(ddItem.Id_DD);
 //    trvDates.Items.AddChild(trvDates.Selected ,aDate);
     end;
   except on E:Exception do
@@ -179,15 +183,15 @@ end;
 
 procedure TfrmMain.Button1Click(Sender: TObject);
 begin
-  if DbRead then AddWeekNodes(fBom);
-//  test_tv;
+  DbRead;        { reads all data in database into our collection one time }
+  { observer will take care of the rest }
 end;
 
 procedure TfrmMain.FormCreate(Sender: TObject);
 begin
   fBom:= CreateBom;                     { create our business object model }
   fDate:= TIsoDate.Create(now);
-  fObserver:= TDD_Observer.Create(memText);
+  fObserver:= TDD_Observer.Create(Self);
   fBom.Observed.FPOAttachObserver(fObserver);
 end;
 
@@ -222,7 +226,8 @@ end;
 
 procedure TfrmMain.btnEditClick(Sender: TObject);
 begin
-  Self.ActiveControl:= memText;
+  ClearTreeview;
+//  Self.ActiveControl:= memText;
 end;
 
 procedure TfrmMain.btnAddClick(Sender: TObject); { ok }
@@ -272,7 +277,8 @@ procedure TfrmMain.DeleteDateNode;
   procedure DeleteNode(aNode: TTreeNode);
   begin
     while aNode.HasChildren do DeleteNode(aNode.GetLastChild);
-    trvDates.Items.Delete(aNode) ;
+    if aNode <> fRootNode then
+      trvDates.Items.Delete(aNode);
   end;
 begin
   if trvDates.Selected = nil then exit;
@@ -280,7 +286,15 @@ begin
   if trvDates.Selected.HasChildren then
     if messagedlg('Delete date and all children ?', mtConfirmation, [mbNo,mbYes], 0 ) <> mrYes then
       exit;
+
   DeleteNode(trvDates.Selected);
+end;
+
+function TfrmMain.ClearTreeview: integer;
+begin
+  trvDates.Select(fRootNode);        { make sure the root-node is selected }
+  DeleteDateNode;                { recursively remove nodes including root }
+//  AddRootNode;
 end;
 
 function TfrmMain.DbRead: boolean;

@@ -216,13 +216,13 @@ end;
 function TDDCollection.Add_Dd: TDDCollectionItem; { ok }
 begin
 //  Result:= fDeltaQueue.CreateNew;
-  Result:= fDDItemClass.Create(Self);
+  Result:= fDDItemClass.Create(Self);      { created with owner collection }
   Result.Id_DD:= 0;
   Result.Date.AsDate:= now;
 end;
 
 { updates the database according to the modified state }
-procedure TDDCollection.DoUpdate(HasConnection: boolean = false);; { refactored 29.07.2015 bc }
+procedure TDDCollection.DoUpdate(HasConnection: boolean = false); { refactored 29.07.2015 bc }
 var
   Tmp,New: TDDCollectionItem;
 begin
@@ -516,8 +516,6 @@ function TDDCollection.ReadBlobDb(const Asc: boolean): boolean;
 var
   anItem: TDDCollectionItem;
   BlobStream: TStream;
-
-  active: integer;
 begin
   anItem:= nil;
   Result:= false;
@@ -531,8 +529,6 @@ begin
     else fDb.Query.SQL.Text:= SelSqlDesc;
     fDb.Query.Open;
     fDb.Query.First;
-ShowMessageFmt('Query count: %d before while',[fDb.Query.RecordCount]);
-//exit;
     while not fDb.Query.EOF do begin
 
       anItem:= Add_Dd;                               { added to collection }
@@ -544,24 +540,14 @@ ShowMessageFmt('Query count: %d before while',[fDb.Query.RecordCount]);
       BlobStream:= fDb.Query.CreateBlobStream(fDb.Query.FieldByName('text_dd'),bmRead);
       anItem.Text.CopyFrom(BlobStream,BlobStream.Size);
       BlobStream.Free;
-active:= integer(fDb.Query.Active);
-ShowMessageFmt('Query active: %d first',[active]); // 1
       anItem.Reserved:= fDb.Query.FieldByName('reserved_dd').AsString;
-active:= integer(fDb.Query.Active);
-ShowMessageFmt('Query active: %d second',[active]); // 1
       anItem.Modified:= mNone;        { make sure we don't get added twice }
-//      AppendToDelta(anItem);
-active:= integer(fDb.Query.Active);
-ShowMessageFmt('Query active: %d third',[active]); // 0 ???
-ShowMessageFmt('Query count: %d',[fDb.Query.RecordCount]);
-exit;
-      anItem:= nil;
       fDb.Query.Next;
-ShowMessageFmt('Query count: %d',[fDb.Query.RecordCount]);
     end;
     EndUpdate;
     fDb.Transaction.Commit;
   end;
+ShowMessageFmt('Collection count: %d',[Self.Count]);
   if fDb.Connected then fDb.DisConnect;          { no dangling connections }
   Result:= true;
   Observed.FPONotifyObservers(Observed.Subject,ooCustom,pointer(Count));
