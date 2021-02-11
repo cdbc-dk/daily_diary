@@ -5,12 +5,14 @@ unit bom_dd;
 interface
 uses
   Classes, SysUtils, db,
+  dialogs,
   bc_utilities,
   dd_settings,
   daily_diary_const,
   bc_datetime,
   bc_mtlinklist,
-  bc_litedb;
+  bc_litedb,
+  bc_observer;
 type
   { TNamedMemorystream }
   TNamedMemorystream = class(TMemoryStream)
@@ -21,12 +23,13 @@ type
     property Name: string read fName write fName;
   end;
 
-  TDDCollection = class;
+  TDDCollection = class; { forward declaration }
   { *** TDDCollectionItem *** }
   TDDCollectionItem = class(TCollectionItem)
   private
     fId_DD: ptruint;       // id from database
     fDate: TIsoDate;       // well duh!
+    fDateStr: string;      // could make ordering easier
     fWeekNumber: ptruint;  // week number
     fText: TStream;        // binary large object - can be anything
 //    fText: TNamedMemorystream;
@@ -39,12 +42,15 @@ type
     destructor Destroy; override;
     property Id_DD: ptruint read fId_DD write fId_DD;
     property Date: TIsoDate read fDate write fDate;
+    property DateStr: string read fDateStr write fDateStr;
     property WeekNumber: ptruint read fWeekNumber write fWeekNumber;
     property Text: TStream read fText write fText;
 //    property Text: TNamedMemorystream read fText write fText;
     property Reserved: string read fReserved write fReserved;
     property Modified: byte read fModified write fModified;
   end; { TDDCollectionItem }
+
+  TDDCollectionItemClass = class of TDDCollectionItem;
 
   { *** TDDQueue *** }
   TDDQueue = class(TbcQueue)
@@ -60,6 +66,7 @@ type
   private
     fBatch: boolean;
     fSortOrder: integer;
+    fDDItemClass: TDDCollectionItemClass;
     function get_DbName: string;
     function get_EngineVersion: string;
     procedure set_DbName(aValue: string);
@@ -68,20 +75,29 @@ type
     fDb: TLiteDb;
     fDeltaQueue: TDDQueue;
     fUpdateCount: ptrint;
-    procedure DoUpdate; { refactored 29.07.2015 bc }
+    { fObserved standalone }
+    fObserved: TObserved;
+    procedure DoUpdate(HasConnection: boolean = false);  { refactored 29.07.2015 bc }
     function AddRecord(anItem: TDDCollectionItem): ptruint; // result is the new ID for the current record
-    procedure UpdateRecord(anItem: TDDCollectionItem);
-    procedure DeleteRecord(anItem: TDDCollectionItem); { remove from database backend }
+    procedure UpdateRecord(anItem: TDDCollectionItem;HasConnection: boolean = false);
+    procedure DeleteRecord(anItem: TDDCollectionItem;HasConnection: boolean = false); { remove from database backend }
   public
-    constructor Create(anItemClass: TCollectionItemClass);
+    constructor Create(anItemClass: TDDCollectionItemClass);
     destructor Destroy; override;
     function CheckTable: boolean; { creates a new table in db-file }
+    function Add_Dd: TDDCollectionItem;
     function AddNew: TDDCollectionItem;
     procedure BackupDb; { 19.04.2015 bc }
-    procedure AppendToDelta(anItem: TDDCollectionItem); { api }
+    procedure AppendToDelta(anItem: TDDCollectionItem;HasConnection: boolean = false); { api }
+    function GetItemFromID(const anId: ptruint): TDDCollectionItem;
     function IndexOf(anItem: TDDCollectionItem): ptrint; { 11.05.2015 bc, returns -1 on not found else collection ID }
-    function UpdateDb(const UpdateNow: boolean): boolean; { refactored 29.07.2015 bc }
+    function UpdateDb(const UpdateNow: boolean;HasConnection: boolean = false): boolean; { refactored 29.07.2015 bc }
     function ReadDb: boolean;
+    function ReadBlobDb(const Asc: boolean): boolean;
+    { test }
+    property Observed: TObserved read fObserved; // ææ
+    { test end }
+    property DDItemClass: TDDCollectionItemClass read fDDItemClass write fDDItemClass;
     property UpdateCount: ptrint read fUpdateCount write fUpdateCount;
     property DbName: string read get_DbName write set_DbName;
     property BatchUpdate: boolean read fBatch write fBatch;
@@ -107,7 +123,8 @@ end;
 procedure TDDCollectionItem.AssignData(aSource: TDDCollectionItem);
 begin
   fId_DD:= aSource.Id_DD;           // id from database
-  fDate:= aSource.Date;             // well duh!
+  fDate.AsInteger:= aSource.Date.AsInteger; // only copy data, NOT pointers
+  fDateStr:= aSource.DateStr;       // searchable datestring
   fWeekNumber:= aSource.WeekNumber; // week number
   aSource.Text.Position:= 0;        // reset to beginning of stream
   fText.Position:= 0;               // reset to beginning of stream
@@ -192,11 +209,20 @@ end;
 function TDDCollection.CheckTable: boolean; { creates a new db if not existing }
 begin
   Result:= true;
-  { creates a new db if not existing }
+  { creates a new db and table if not existing }
   try fDb.RunSQL(daily_diary_const.CreateDb); except  end;
 end;
 
-procedure TDDCollection.DoUpdate; { refactored 29.07.2015 bc }
+function TDDCollection.Add_Dd: TDDCollectionItem; { ok }
+begin
+//  Result:= fDeltaQueue.CreateNew;
+  Result:= fDDItemClass.Create(Self);      { created with owner collection }
+  Result.Id_DD:= 0;
+  Result.Date.AsDate:= now;
+end;
+
+{ updates the database according to the modified state }
+procedure TDDCollection.DoUpdate(HasConnection: boolean = false); { refactored 29.07.2015 bc }
 var
   Tmp,New: TDDCollectionItem;
 begin
@@ -204,16 +230,20 @@ begin
     Tmp:= fDeltaQueue.Dequeue;
     case Tmp.Modified of
       mAdded:   begin
-                  New:= TDDCollectionItem(Add); { gets an ownership from collection }
-                  AddRecord(Tmp);                      { persist in database }
-                  New.AssignData(Tmp);           { copy data to the new item }
+                  New:= Add_Dd;        { gets an ownership from collection }
+                  AddRecord(Tmp);                    { persist in database }
+                  New.AssignData(Tmp);         { copy data to the new item }
+                  { test }
+//                  Observed.FPONotifyObservers(Observed.Subject,ooAddItem,pointer(Tmp));
+                  Observed.FPONotifyObservers(Observed.Subject,ooAddItem,pointer(New));
+                  { test end }
                 end;
-      mAltered: UpdateDb(true);              { persist changes in database }
+      mAltered: UpdateRecord(Tmp);           { persist changes in database }
       mDelete:  begin
                   DeleteRecord(Tmp); { takes care of the database back-end }
                   DeleteItem(Tmp);  { removes the item from our collection }
                 end;
-    end;
+    end; { end case }
     FreeAndNil(Tmp);
   end;
 end;
@@ -221,13 +251,14 @@ end;
 { addrecord persists anitem to database and returns the new row_id as a result }
 function TDDCollection.AddRecord(anItem: TDDCollectionItem): ptruint;
 begin
-  if fDb.Connect then begin                  { connect checks for connected }
+  if fDb.Connect then try                  { connect checks for connected }
     if not fDb.Transaction.Active then begin
       fDb.Transaction.StartTransaction;
       fDb.Query.Close;
       fDb.Query.SQL.Text:= InsSql;
       fDb.Query.Prepare;
       fDb.Query.ParamByName('pdate').AsInteger:= anItem.Date.AsInteger;
+      fDb.Query.ParamByName('pdatestr').AsString:= anItem.DateStr;
       fDb.Query.ParamByName('pweekno').AsInteger:= anItem.Date.ISOWeekNumber;
       anItem.Text.Position:= 0; { always remember to reset position }
       fDb.Query.ParamByName('ptext').LoadFromStream(anItem.Text,ftBlob);
@@ -254,57 +285,62 @@ begin
       fDb.Transaction.Commit;
       anItem.Modified:= mNone;
     end;
-    fDb.DisConnect;                               { no dangling connections }
-  end;
-  FPONotifyObservers(Self,ooAddItem,pointer(anItem));
+    fDb.DisConnect;                              { no dangling connections }
+  except on E:Exception do Showmessage('Error in addrecord '+E.Message); end;
 end;
 
-procedure TDDCollection.UpdateRecord(anItem: TDDCollectionItem);
+procedure TDDCollection.UpdateRecord(anItem: TDDCollectionItem;
+                                     HasConnection: boolean = false);
 begin
-  if fDb.Connect then begin                 { connect checks for connected }
-    if not fDb.Transaction.Active then begin
-      fDb.Transaction.StartTransaction;
-      fDb.Query.Close;
-      fDb.Query.SQL.Text:= UpdSql;
-      fDb.Query.Prepare;
-      fDb.Query.ParamByName('pdate').AsInteger:= anItem.Date.AsInteger;
-      fDb.Query.ParamByName('pweekno').AsInteger:= anItem.Date.ISOWeekNumber;
-      anItem.Text.Position:= 0; { always remember to reset position }
-      fDb.Query.ParamByName('ptext').LoadFromStream(anItem.Text,ftBlob);
-      fDb.Query.ParamByName('pres').AsString:= anItem.Reserved;
-      fDb.Query.ParamByName('pid').AsInteger:= anItem.Id_DD;
-      fDb.Query.ExecSQL;
-      fDb.Transaction.Commit;
-      anItem.Modified:= mNone;
-    end;
+  if not HasConnection then begin
+    fDb.Connect;                            { connect checks for connected }
+  end;
+  if not fDb.Transaction.Active then begin
+    fDb.Transaction.StartTransaction;
+    fDb.Query.Close;
+    fDb.Query.SQL.Text:= UpdSql;
+    fDb.Query.Prepare;
+    fDb.Query.ParamByName('pdate').AsInteger:= anItem.Date.AsInteger;
+    fDb.Query.ParamByName('pdatestr').AsString:= anItem.DateStr;
+    fDb.Query.ParamByName('pweekno').AsInteger:= anItem.Date.ISOWeekNumber;
+    anItem.Text.Position:= 0; { always remember to reset position }
+    fDb.Query.ParamByName('ptext').LoadFromStream(anItem.Text,ftBlob);
+    fDb.Query.ParamByName('pres').AsString:= anItem.Reserved;
+    fDb.Query.ParamByName('pid').AsInteger:= anItem.Id_DD;
+    fDb.Query.ExecSQL;
+    fDb.Transaction.Commit;
+    anItem.Modified:= mNone;
+  end;
+  if not HasConnection then begin
     fDb.DisConnect;                              { no dangling connections }
   end;
-  { fpc built-in observer pattern }
-  FPONotifyObservers(Self,ooChange,pointer(anItem));
 end;
 
-procedure TDDCollection.DeleteRecord(anItem: TDDCollectionItem); { ok }
+procedure TDDCollection.DeleteRecord(anItem: TDDCollectionItem;
+                                     HasConnection: boolean = false); { ok }
 begin
-  if fDb.Connect then begin                 { connect checks for connected }
-    if not fDb.Transaction.Active then begin
-      fDb.Transaction.StartTransaction;
-      fDb.Query.Close;
-      fDb.Query.SQL.Text:= DelSql; { 'DELETE FROM daily_diary WHERE id_dd=:pid;' }
-      fDb.Query.Prepare;
-      fDb.Query.ParamByName('pid').AsInteger:= anItem.Id_DD;
-      fDb.Query.ExecSQL;
-      fDb.Transaction.Commit;
-    end;
+  if not HasConnection then begin
+    fDb.Connect;                            { connect checks for connected }
+  end;
+  if not fDb.Transaction.Active then begin
+    fDb.Transaction.StartTransaction;
+    fDb.Query.Close;
+    fDb.Query.SQL.Text:= DelSql; { 'DELETE FROM daily_diary WHERE id_dd=:pid;' }
+    fDb.Query.Prepare;
+    fDb.Query.ParamByName('pid').AsInteger:= anItem.Id_DD;
+    fDb.Query.ExecSQL;
+    fDb.Transaction.Commit;
+  end;
+  if not HasConnection then begin
     fDb.DisConnect;                              { no dangling connections }
   end;
 //  DeleteItem(anItem);                    { delete item from our collection }
-  { fpc built-in observer pattern }
-  FPONotifyObservers(Self,ooDeleteItem,pointer(anItem));
 end;
 
-constructor TDDCollection.Create(anItemClass: TCollectionItemClass); { ok }
+constructor TDDCollection.Create(anItemClass: TDDCollectionItemClass); { ok }
 begin
   inherited Create(anItemClass);                { get our collection going }
+  fDDItemClass:= anItemClass;
   fDb:= TLiteDb.Create;                       { create our database engine }
   fDb.DbName:= DDSettings.Databasename;                   { 02.02.2021 /bc }
   fDb.Connect;        { connect to our database, if nonexisting create one }
@@ -314,6 +350,9 @@ begin
   fBatch:= false;
   fBatch:= DDSettings.BatchUpdates;                       { 19.04.2015 /bc }
   fUpdateCount:= DDSettings.BatchCount;                   { 19.04.2015 /bc }
+  { test }
+  fObserved:= TObserved.Create(Self);
+  { test end }
 end;
 
 destructor TDDCollection.Destroy;
@@ -322,6 +361,9 @@ begin
   fDeltaQueue.Free;
   if fDb.Connected then fDb.DisConnect;
   fDb.Free;
+  { test }
+  FreeAndNil(fObserved);
+  { test end }
   inherited Destroy;
 end;
 
@@ -376,14 +418,34 @@ begin
   end;
 end;
 
-procedure TDDCollection.AppendToDelta(anItem: TDDCollectionItem); { ok }
+procedure TDDCollection.AppendToDelta(anItem: TDDCollectionItem;
+                                      HasConnection: boolean = false); { ok }
 begin
   if assigned(anItem) then begin
     fDeltaQueue.Enqueue(anItem); // add to delta for db persistence
     { in case of delete, force updatenow 29.07.2015 bc }
-    if anItem.Modified = mDelete then UpdateDb(true)
-    else UpdateDb(not fBatch); // updates now or every n-th record
+    if anItem.Modified = mDelete then UpdateDb(true,HasConnection)
+    else UpdateDb(not fBatch,HasConnection); // updates now or every n-th record
   end;
+end;
+
+function TDDCollection.GetItemFromID(const anId: ptruint): TDDCollectionItem;
+var
+  Idx: ptruint;
+begin
+  Result:= nil;
+  if Self.Count = 0 then ShowMessage('ERROR: Collection is emty!');
+exit;
+  { perform a linear search }
+//  for Idx:= 0 to Self.Count-1 do begin
+  try
+    for Idx:= Count-1 downto 0 do begin              { searching backwards }
+      if TDDCollectionItem(Items[Idx]).Id_DD = anId then begin
+        Result:= TDDCollectionItem(Items[Idx]);                 { found it }
+        break;                                                      { done }
+      end;
+    end;
+  except  end;
 end;
 
 function TDDCollection.IndexOf(anItem: TDDCollectionItem): ptrint; { ok }
@@ -402,14 +464,18 @@ begin
   end;
 end;
 
-function TDDCollection.UpdateDb(const UpdateNow: boolean): boolean; { ok }// db writes
-begin { original code moved to "cutaway.txt" }
+function TDDCollection.UpdateDb(const UpdateNow: boolean;HasConnection: boolean = false): boolean; { ok }// db writes
+begin
   Result:= false;
-  if not fDb.Connected then fDb.Connect;
+  if not HasConnection then begin
+    if not fDb.Connected then fDb.Connect;
+  end;
   if not UpdateNow then begin { cater for batch updates }
     if fDeltaQueue.Count >= fUpdateCount then DoUpdate;
   end else DoUpdate;
-  if fDb.Connected then fDb.DisConnect;
+  if not HasConnection then begin
+    if fDb.Connected then fDb.DisConnect;  //ææ
+  end;
   Result:= true;
 end; { refactored 29.07.2015 bc -> actual writes moved to "DoUpdate" }
 
@@ -424,7 +490,7 @@ begin
   BeginUpdate;
   Ds:= TMemDataset.Create(nil);
   try
-    fDb.QuerySQL(daily_diary_const.SelSql,Ds); // fills the dataset with fielddefs and data
+    fDb.QuerySQL(daily_diary_const.SelSqlAsc,Ds); // fills the dataset with fielddefs and data
     Ds.First;
     while not Ds.EOF do begin
       Bci:= TDDCollectionItem(Add);
@@ -444,8 +510,61 @@ begin
   end;
   EndUpdate;
   if fDb.Connected then fDb.DisConnect;
-  FPONotifyObservers(Self,ooCustom,pointer(Self.Count)); { fpc built-in observer pattern }
 end;
+
+function TDDCollection.ReadBlobDb(const Asc: boolean): boolean;
+var
+  anItem: TDDCollectionItem;
+  BlobStream: TStream;
+begin
+  anItem:= nil;
+  Result:= false;
+  Clear;
+  if not fDb.Connected then fDb.Connect;
+  if not fDb.Transaction.Active then begin
+    fDb.Transaction.StartTransaction;
+    BeginUpdate;
+    Clear;
+    fDb.Query.Close;
+    if Asc then fDb.Query.SQL.Text:= SelSqlAsc
+    else fDb.Query.SQL.Text:= SelSqlDesc;
+    fDb.Query.Open;
+    fDb.Query.First;
+    while not fDb.Query.EOF do begin
+      anItem:= Add_Dd;                               { added to collection }
+      anItem.Id_DD:= fDb.Query.FieldByName('id_dd').AsInteger;
+      anItem.Date.AsInteger:= fDb.Query.FieldByName('date_dd').AsInteger;
+      anItem.DateStr:= fDb.Query.FieldByName('datestr_dd').AsString;
+      anItem.WeekNumber:= fDb.Query.FieldByName('weeknumber_dd').AsInteger;
+      anItem.Text.Position:= 0;
+      BlobStream:= fDb.Query.CreateBlobStream(fDb.Query.FieldByName('text_dd'),bmRead);
+      anItem.Text.CopyFrom(BlobStream,BlobStream.Size);
+      BlobStream.Free;
+      anItem.Reserved:= fDb.Query.FieldByName('reserved_dd').AsString;
+      anItem.Modified:= mNone;        { make sure we don't get added twice }
+      fDb.Query.Next;
+    end;
+    EndUpdate;
+    fDb.Transaction.Commit;
+  end;
+ShowMessageFmt('Collection count: %d',[Self.Count]);
+  if fDb.Connected then fDb.DisConnect;          { no dangling connections }
+  Result:= true;
+  Observed.FPONotifyObservers(Observed.Subject,ooCustom,pointer(Count));
+end;
+
+(*
+var
+  BlobStream: TStream;
+  M: TFileStream;
+
+BlobStream:= fDb.Query.CreateBlobStream(fDb.Query.FieldByName('content_photos'),bmRead);
+M:= TFileStream.Create(SaveDialog1.FileName,fmCreate);
+BlobStream.Position:= 0;
+M.CopyFrom(BlobStream,BlobStream.Size);
+M.Free;
+BlobStream.Free;
+*)
 
 constructor TDDCollectionItem.Create(aCollection: TDDCollection);
 begin
