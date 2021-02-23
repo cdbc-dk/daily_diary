@@ -175,6 +175,7 @@ object frmMain: TfrmMain
     end
   end
   object dlgCalender: TCalendarDialog
+    Date = 44250
     OKCaption = '&OK'
     CancelCaption = 'Cancel'
     Left = 72

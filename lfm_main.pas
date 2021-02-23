@@ -1,30 +1,21 @@
 unit lfm_main;
 
 {$mode objfpc}{$H+}
-
+{$define debug}
 interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ComCtrls, StdCtrls,
   ExtCtrls, ExtDlgs, Buttons,
   daily_diary_const,
+  u_treeview,
   bom_dd,
   bc_datetime,
   bc_observer;
 
-(*
-
-
-*)
-
-
-
 type
   TObjectClass = class of TObject;
   {*** TDD_Observer ***}
-
-  { TDD_Observer }
-
   TDD_Observer = class(TObserver)
   protected
     fOwner: TObject;
@@ -157,6 +148,9 @@ begin
     fRootNode.Selected:= true;  { make sure that our root-node is selected }
     fRootNode.Data:= nil;
   end;
+  {$ifdef debug}
+    memText.Lines.Add('AddRootNode -> OK');
+  {$endif}
 end;
 
 procedure TfrmMain.AddYearNode(const anItem: TDDCollectionItem);
@@ -169,7 +163,7 @@ begin
 //  ClearTreeview;                { clears the treeview except the root node }
   YearExists:= SearchTreeViewBool(fRootNode,anItem.Date.YearAsString);
 if YearExists then ShowMessage('found: '+anItem.Date.YearAsString);
-end; // TODO: differntiate search criteria...
+end; // TODO: differentiate search criteria...
 
 procedure TfrmMain.AddWeekNodes(aCollection: TDDCollection);
 var
@@ -193,6 +187,9 @@ begin
     ShowMessage('ERROR: '+E.Message);
   end;
   if trvDates.Items.Count > 0 then fRootNode.Expand(false);
+  {$ifdef debug}
+    memText.Lines.Add('AddWeekNodes -> OK');
+  {$endif}
 end;
 
 function TfrmMain.AddEntryToTreeView(const anEntry: TDDCollectionItem): integer;
@@ -204,6 +201,9 @@ procedure TfrmMain.Button1Click(Sender: TObject);
 begin
   DbRead;        { reads all data in database into our collection one time }
   { observer will take care of the rest }
+  {$ifdef debug}
+    memText.Lines.Add('DbRead -> OK');
+  {$endif}
 end;
 
 procedure TfrmMain.FormCreate(Sender: TObject);
@@ -245,9 +245,12 @@ end;
 
 procedure TfrmMain.btnEditClick(Sender: TObject);
 var
+  Res: integer;
   lNode: TTreeNode;
 begin
-  SearchTreeViewBool(fRootNode,'46');
+  Res:= 0;
+  Res:= integer(SearchTreeViewBool(fRootNode,'15'));
+  ShowMessageFmt('Node 15 returns %d',[Res]);
   lNode:= SearchTreeViewItem(fRootNode,'17');
   if lNode <> nil then
     ShowMessage('Result from SearchTreeViewItem: [ '+lNode.Text+' ]');
@@ -352,6 +355,10 @@ begin
   end;
   if aNode.HasChildren then lNode:= aNode.GetLastChild;
   while aNode.HasChildren do begin
+    if lNode = nil then begin
+      Result:= false;
+      break; // ææ let's see
+    end;
     if lNode.Text = aSearchString then begin
 ShowMessage('Found Item: '+lNode.Text);
       Result:= true;
