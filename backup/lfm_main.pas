@@ -8,6 +8,7 @@ uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ComCtrls, StdCtrls,
   ExtCtrls, ExtDlgs, Buttons,
   daily_diary_const,
+  treeview_helper,
   bom_dd,
   bc_datetime,
   bc_observer;
@@ -58,7 +59,7 @@ type
     fObserver: TDD_Observer;
     fDate: TIsoDate;
     procedure AddRootNode;
-    procedure AddYearNode(const anItem: TDDCollectionItem);
+    procedure AddYearNodes(const aCollection: TDDCollection);
     procedure AddWeekNodes(aCollection: TDDCollection);
     function AddEntryToTreeView(const anEntry: TDDCollectionItem): integer;
     function AddChildNodes(const aDate: string): integer;  { flexible result, better than boolean }
@@ -104,17 +105,21 @@ var
   ddform: TfrmMain;
 begin
   ddform:= TfrmMain(fOwner);
+  ddCollection:= TDDCollection(aSender);
 //  inherited FPOObservedChanged(ASender, Operation, Data);
   case Operation of
     ooAddItem:    begin
+
                     ddEntry:= TDDCollectionItem(Data);
+                    ddform.AddYearNodes(ddCollection);
   //                 AddEntryToTreeView();
                     ddform.memText.Lines.Add('< AddItem received... >');
                     ddform.memText.Lines.Add(ddEntry.Date.AsString+' | '+
                                              ddEntry.DateStr+' | '+
                                              ddEntry.WeekNumber.ToString+' | '+
                                              'Text'+' | '+
-                                             ddEntry.Reserved);
+                                             ddEntry.Reserved+' | '+
+                                             bcTimeToStr(now));
                   end;
     ooChange:     begin
                     // TODO
@@ -123,9 +128,11 @@ begin
                     // TODO
                   end;
     ooCustom:     begin                             { dataset read from db }
-                    ddCollection:= TDDCollection(aSender);
+
                     if ddCollection.Count > 0 then
-                      ddform.AddWeekNodes(ddCollection);
+                    //  ddform.AddWeekNodes(ddCollection);
+                    ddform.AddYearNodes(ddCollection);
+
                   end;
   end;
 end;
@@ -152,16 +159,34 @@ begin
   {$endif}
 end;
 
-procedure TfrmMain.AddYearNode(const anItem: TDDCollectionItem);
+procedure TfrmMain.AddYearNodes(const aCollection: TDDCollection); { OK }
 var
   YearExists: boolean;
+  Idx: ptruint;
+  ddItem: TDDCollectionItem;
+  ChildNode: TTreeNode;
 begin
   if trvDates.Selected = nil then begin
     trvDates.select(fRootNode);       { make sure the rootnode is selected }
   end;
-//  ClearTreeview;                { clears the treeview except the root node }
-  YearExists:= SearchTreeViewBool(fRootNode,anItem.Date.YearAsString);
-if YearExists then ShowMessage('found: '+anItem.Date.YearAsString);
+  ClearTreeview;                { clears the treeview except the root node }
+  for Idx:= 0 to aCollection.Count-1 do begin
+    { add childnodes under the parent node (frootnode) if not existing }
+    ddItem:= TDDCollectionItem(aCollection.Items[Idx]);
+    { this works! }
+    YearExists:= treeview_helper.SearchTreeViewLevelBool(trvDates,
+                                                         ddItem.Date.YearAsString);
+    if not YearExists then begin { add year-node under the parent node (frootnode) }
+      ChildNode:= trvDates.Items.AddChild(fRootNode,ddItem.Date.YearAsString); // try with fixed root
+      ChildNode.Data:= Pointer(ddItem.Id_DD); { save the ID, may come in handy }
+      ChildNode.ImageIndex:= 3;    { normal image }
+      ChildNode.SelectedIndex:= 2; { selected image }
+    end;
+  end;
+  fRootNode.Expanded:= true;
+  {$ifdef debug}
+    memText.Lines.Add('AddYearNodes -> OK');
+  {$endif}
 end; // TODO: differentiate search criteria...
 
 procedure TfrmMain.AddWeekNodes(aCollection: TDDCollection);
@@ -174,7 +199,7 @@ begin
     if trvDates.Selected = nil then begin
       trvDates.select(fRootNode);     { make sure the rootnode is selected }
     end;
-    ClearTreeview;              { clears the treeview except the root node }
+//    ClearTreeview;              { clears the treeview except the root node }
     for Idx:= 0 to aCollection.Count-1 do begin
       { add childnodes under the parent node (frootnode) }
       ddItem:= TDDCollectionItem(aCollection.Items[Idx]);
@@ -347,10 +372,13 @@ end;
 begin
   Result:= false;
   if trvDates.Items.Count <= 1 then begin
+    exit;
+(*
     if messagedlg('ERROR: Cannot search an empty dataset!',
                   mtError,
                   [mbClose],
                   0 ) = mrClose then exit;
+*)
   end;
   if aNode.HasChildren then lNode:= aNode.GetLastChild;
   while aNode.HasChildren do begin
@@ -359,7 +387,7 @@ begin
       break; // ææ let's see
     end;
     if lNode.Text = aSearchString then begin
-ShowMessage('Found Item: '+lNode.Text);
+//ShowMessage('Found Item: '+lNode.Text);
       Result:= true;
       break;
     end;
