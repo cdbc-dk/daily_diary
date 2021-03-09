@@ -18,8 +18,6 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="176"/>
-        <CursorPos Y="179"/>
         <UsageCount Value="217"/>
         <Bookmarks Count="1">
           <Item0 X="11" Y="384"/>
@@ -243,7 +241,6 @@
     </RunParams>
   </ProjectSession>
   <Debugging>
-    <BreakPoints Count="3">
       <Item1>
         <Kind Value="bpkSource"/>
         <WatchScope Value="wpsLocal"/>
