@@ -203,7 +203,6 @@ begin
 //    ClearTreeview;              { clears the treeview except the root node }
     for Idx:= 0 to aCollection.Count-1 do begin
       { add childnodes under the parent node (yearnode) }
-
       ddItem:= TDDCollectionItem(aCollection.Items[Idx]);
       ChildNode:= trvDates.Items.AddChild(fRootNode, ddItem.WeekNumber.ToString); // try with fixed root
       ChildNode.Data:= Pointer(ddItem.Id_DD);

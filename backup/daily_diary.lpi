@@ -65,7 +65,7 @@
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir);../../bc_rtl/include"/>
-      <OtherUnitFiles Value="global;bom;../../bc_rtl"/>
+      <OtherUnitFiles Value="global;bom;../../bc_rtl;utility"/>
       <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <Linking>
