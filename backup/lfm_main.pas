@@ -191,7 +191,7 @@ procedure TfrmMain.FormCreate(Sender: TObject);
 begin
   fBom:= CreateBom;                     { create our business object model }
   fDate:= TIsoDate.Create(now);
-  fObserver:= TDD_Observer.Create(frmMain);
+  fObserver:= TDD_Observer.Create(Self);
   fBom.Observed.FPOAttachObserver(fObserver);
 end;
 

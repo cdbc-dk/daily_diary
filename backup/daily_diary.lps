@@ -19,7 +19,7 @@
         <ResourceBaseClass Value="Form"/>
         <IsVisibleTab Value="True"/>
         <TopLine Value="125"/>
-        <CursorPos X="29" Y="132"/>
+        <CursorPos Y="130"/>
         <UsageCount Value="217"/>
         <Bookmarks Count="3">
           <Item0 X="22" Y="115"/>
@@ -340,7 +340,7 @@
     </RunParams>
   </ProjectSession>
   <Debugging>
-    <BreakPoints Count="5">
+    <BreakPoints Count="6">
       <Item1>
         <Kind Value="bpkSource"/>
         <WatchScope Value="wpsLocal"/>
@@ -376,6 +376,13 @@
         <Source Value="lfm_main.pas"/>
         <Line Value="296"/>
       </Item5>
+      <Item6>
+        <Kind Value="bpkSource"/>
+        <WatchScope Value="wpsLocal"/>
+        <WatchKind Value="wpkWrite"/>
+        <Source Value="lfm_main.pas"/>
+        <Line Value="130"/>
+      </Item6>
     </BreakPoints>
     <Watches Count="2">
       <Item1>
