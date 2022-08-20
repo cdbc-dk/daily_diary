@@ -3,25 +3,21 @@
   <ProjectSession>
     <Version Value="11"/>
     <BuildModes Active="Default"/>
-    <Units Count="6">
+    <Units Count="18">
       <Unit0>
         <Filename Value="daily_diary.lpr"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="-1"/>
-        <WindowIndex Value="-1"/>
-        <TopLine Value="-1"/>
-        <CursorPos X="-1" Y="-1"/>
-        <UsageCount Value="20"/>
+        <CursorPos X="49" Y="6"/>
+        <UsageCount Value="217"/>
       </Unit0>
       <Unit1>
         <Filename Value="lfm_main.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="frmMain"/>
+        <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
-        <TopLine Value="90"/>
-        <CursorPos X="26" Y="99"/>
-        <UsageCount Value="20"/>
+        </Bookmarks>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit1>
@@ -30,152 +26,107 @@
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="41" Y="3"/>
-        <UsageCount Value="20"/>
+        <UsageCount Value="217"/>
       </Unit2>
       <Unit3>
-        <Filename Value="global/daily_diary_const.pas"/>
-        <EditorIndex Value="2"/>
-        <TopLine Value="48"/>
-        <CursorPos X="12" Y="54"/>
-        <UsageCount Value="10"/>
+        <Filename Value="bom/bom_dd.pas"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="5"/>
+        <TopLine Value="10"/>
+        <UsageCount Value="217"/>
         <Loaded Value="True"/>
       </Unit3>
       <Unit4>
-        <Filename Value="/usr/share/fpcsrc/rtl/objpas/classes/classesh.inc"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="100"/>
-        <CursorPos X="22" Y="101"/>
-        <UsageCount Value="10"/>
+        <Filename Value="global/daily_diary_const.pas"/>
+        <EditorIndex Value="7"/>
+        <TopLine Value="43"/>
+        <CursorPos X="3" Y="56"/>
+        <UsageCount Value="108"/>
+        <Loaded Value="True"/>
       </Unit4>
       <Unit5>
-        <Filename Value="/usr/lib64/lazarus/lcl/include/treeview.inc"/>
-        <EditorIndex Value="1"/>
-        <TopLine Value="4476"/>
-        <CursorPos Y="4487"/>
-        <UsageCount Value="10"/>
-        <Loaded Value="True"/>
+        <Filename Value="/usr/share/fpcsrc/rtl/objpas/classes/classesh.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="355"/>
+        <CursorPos X="15" Y="358"/>
       </Unit5>
+      <Unit6>
+        <Filename Value="../../bc_rtl/bc_datetime.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="211"/>
+        <CursorPos X="17" Y="186"/>
+      </Unit6>
+      <Unit7>
+        <Filename Value="../../bc_rtl/bc_litedb.pas"/>
+        <EditorIndex Value="6"/>
+        <TopLine Value="170"/>
+        <CursorPos X="3" Y="174"/>
+        <UsageCount Value="100"/>
+        <Loaded Value="True"/>
+      </Unit7>
+      <Unit8>
+        <Filename Value="../../bc_rtl/bc_memdataset.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="76"/>
+        <CursorPos X="33" Y="82"/>
+      </Unit8>
+      <Unit9>
+        <Filename Value="../../bc_rtl/bc_observer.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="138"/>
+      </Unit9>
+      <Unit10>
+        <Filename Value="/usr/lib64/lazarus/lcl/dialogs.pp"/>
+        <UnitName Value="Dialogs"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="49"/>
+        <CursorPos X="10" Y="58"/>
+      </Unit10>
+      <Unit11>
+        <Filename Value="/usr/lib64/lazarus/components/lazutils/uitypes.pas"/>
+        <UnitName Value="UITypes"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="23"/>
+        <CursorPos X="10" Y="34"/>
+      </Unit11>
+      <Unit12>
+        <Filename Value="snippets/db_snippets.pas"/>
+        <EditorIndex Value="4"/>
+        <UsageCount Value="107"/>
+        <Loaded Value="True"/>
+      </Unit12>
+      <Unit13>
+        <Filename Value="utility/u_treeview.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="49"/>
+        <CursorPos X="51" Y="7"/>
+      </Unit13>
+      <Unit14>
+        <Filename Value="../../bc_rtl/bc_observer_2.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="78"/>
+        <CursorPos X="21" Y="86"/>
+        <Bookmarks Count="2">
+          <Item0 X="5" Y="112"/>
+          <Item1 X="13" Y="43" ID="1"/>
+        </Bookmarks>
+      </Unit14>
+      <Unit15>
+        <Filename Value="utility/treeview_helper.pas"/>
+        <UsageCount Value="105"/>
+        <Loaded Value="True"/>
+      </Unit15>
+      <Unit16>
+        <Filename Value="/usr/lib64/lazarus/lcl/comctrls.pp"/>
+        <UnitName Value="ComCtrls"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="16"/>
+        <CursorPos X="41" Y="23"/>
+      </Unit17>
     </Units>
     <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
         <Filename Value="/usr/lib64/lazarus/lcl/include/treeview.inc"/>
-        <Caret Line="6209" TopLine="6199"/>
-      </Position1>
-      <Position2>
-        <Filename Value="/usr/lib64/lazarus/lcl/include/treeview.inc"/>
-        <Caret Line="4506" TopLine="4499"/>
-      </Position2>
-      <Position3>
-        <Filename Value="/usr/lib64/lazarus/lcl/include/treeview.inc"/>
-        <Caret Line="4523" TopLine="4517"/>
-      </Position3>
-      <Position4>
-        <Filename Value="/usr/lib64/lazarus/lcl/include/treeview.inc"/>
-        <Caret Line="6210" TopLine="6203"/>
-      </Position4>
-      <Position5>
-        <Filename Value="/usr/lib64/lazarus/lcl/include/treeview.inc"/>
-        <Caret Line="6359" TopLine="6352"/>
-      </Position5>
-      <Position6>
-        <Filename Value="/usr/lib64/lazarus/lcl/include/treeview.inc"/>
-        <Caret Line="4506" TopLine="4499"/>
-      </Position6>
-      <Position7>
-        <Filename Value="/usr/lib64/lazarus/lcl/include/treeview.inc"/>
-        <Caret Line="4507" TopLine="4499"/>
-      </Position7>
-      <Position8>
-        <Filename Value="/usr/lib64/lazarus/lcl/include/treeview.inc"/>
-        <Caret Line="5458" TopLine="5451"/>
-      </Position8>
-      <Position9>
-        <Filename Value="/usr/lib64/lazarus/lcl/include/treeview.inc"/>
-        <Caret Line="5459" TopLine="5451"/>
-      </Position9>
-      <Position10>
-        <Filename Value="/usr/lib64/lazarus/lcl/include/treeview.inc"/>
-        <Caret Line="5460" TopLine="5451"/>
-      </Position10>
-      <Position11>
-        <Filename Value="/usr/lib64/lazarus/lcl/include/treeview.inc"/>
-        <Caret Line="4512" TopLine="4506"/>
-      </Position11>
-      <Position12>
-        <Filename Value="/usr/lib64/lazarus/lcl/include/treeview.inc"/>
-        <Caret Line="4513" TopLine="4506"/>
-      </Position12>
-      <Position13>
-        <Filename Value="/usr/lib64/lazarus/lcl/include/treeview.inc"/>
-        <Caret Line="4514" TopLine="4506"/>
-      </Position13>
-      <Position14>
-        <Filename Value="/usr/lib64/lazarus/lcl/include/treeview.inc"/>
-        <Caret Line="4515" TopLine="4506"/>
-      </Position14>
-      <Position15>
-        <Filename Value="/usr/lib64/lazarus/lcl/include/treeview.inc"/>
-        <Caret Line="4517" TopLine="4506"/>
-      </Position15>
-      <Position16>
-        <Filename Value="/usr/lib64/lazarus/lcl/include/treeview.inc"/>
-        <Caret Line="4519" TopLine="4513"/>
-      </Position16>
-      <Position17>
-        <Filename Value="/usr/lib64/lazarus/lcl/include/treeview.inc"/>
-        <Caret Line="4520" TopLine="4513"/>
-      </Position17>
-      <Position18>
-        <Filename Value="/usr/lib64/lazarus/lcl/include/treeview.inc"/>
-        <Caret Line="4522" TopLine="4513"/>
-      </Position18>
-      <Position19>
-        <Filename Value="/usr/lib64/lazarus/lcl/include/treeview.inc"/>
-        <Caret Line="4523" TopLine="4513"/>
-      </Position19>
-      <Position20>
-        <Filename Value="/usr/lib64/lazarus/lcl/include/treeview.inc"/>
-        <Caret Line="6360" TopLine="6353"/>
-      </Position20>
-      <Position21>
-        <Filename Value="/usr/lib64/lazarus/lcl/include/treeview.inc"/>
-        <Caret Line="6363" TopLine="6353"/>
-      </Position21>
-      <Position22>
-        <Filename Value="lfm_main.pas"/>
-        <Caret Line="69" TopLine="57"/>
-      </Position22>
-      <Position23>
-        <Filename Value="/usr/lib64/lazarus/lcl/include/treeview.inc"/>
-        <Caret Line="4483" TopLine="4476"/>
-      </Position23>
-      <Position24>
-        <Filename Value="/usr/lib64/lazarus/lcl/include/treeview.inc"/>
-        <Caret Line="4486" TopLine="4476"/>
-      </Position24>
-      <Position25>
-        <Filename Value="/usr/lib64/lazarus/lcl/include/treeview.inc"/>
-        <Caret Line="4487" TopLine="4476"/>
-      </Position25>
-      <Position26>
-        <Filename Value="lfm_main.pas"/>
-        <Caret Line="76" TopLine="70"/>
-      </Position26>
-      <Position27>
-        <Filename Value="lfm_main.pas"/>
-        <Caret Line="30" Column="26" TopLine="24"/>
-      </Position27>
-      <Position28>
-        <Filename Value="lfm_main.pas"/>
-        <Caret Line="74" Column="65" TopLine="69"/>
-      </Position28>
-      <Position29>
-        <Filename Value="lfm_main.pas"/>
-        <Caret Line="78" Column="13" TopLine="74"/>
-      </Position29>
-      <Position30>
-        <Filename Value="lfm_main.pas"/>
-        <Caret Line="30" Column="14" TopLine="24"/>
       </Position30>
     </JumpHistory>
     <RunParams>
@@ -183,4 +134,30 @@
       <Modes Count="0" ActiveMode=""/>
     </RunParams>
   </ProjectSession>
+  <Debugging>
+    <BreakPoints Count="2">
+      <Item1>
+        <Kind Value="bpkSource"/>
+        <WatchScope Value="wpsLocal"/>
+        <WatchKind Value="wpkWrite"/>
+        <Source Value="../../bc_rtl/bc_observer.pas"/>
+        <Line Value="95"/>
+      </Item1>
+      <Item2>
+        <Kind Value="bpkData"/>
+        <WatchData Value="tmp"/>
+        <WatchScope Value="wpsGlobal"/>
+        <WatchKind Value="wpkWrite"/>
+        <InitialEnabled Value="False"/>
+      </Item2>
+    </BreakPoints>
+    <Watches Count="2">
+      <Item1>
+        <Expression Value="asearchstring"/>
+      </Item1>
+      <Item2>
+        <Expression Value="lNode.Text"/>
+      </Item2>
+    </Watches>
+  </Debugging>
 </CONFIG>

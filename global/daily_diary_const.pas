@@ -9,22 +9,23 @@ uses
 
 const
   MainTitle = 'Daily Diary';
-  Version = '0.28.01.2021-alfa';
+  UnitVersion = '0.01.02.2021-alfa';
   cdsQuit = -999;
   { sql statements }
   { create daily diary table }
-  CreateDb = 'CREATE TABLE daily_diary(id_dd integer primary key, date_dd integer, weeknumber_dd integer, text_dd blob, reserved_dd varchar(512));';
+  CreateDb = 'CREATE TABLE daily_diary(id_dd integer primary key, date_dd integer, datestr_dd varchar(10), weeknumber_dd integer, text_dd blob, reserved_dd varchar(512));';
   { insert in daily diary by parameters }
-  InsSql = 'INSERT INTO daily_diary(id_dd,date_dd,weeknumber_dd,text_dd,reserved_dd) VALUES(null,p:date,p:weekno,p:text,p:res);';
+  InsSql = 'INSERT INTO daily_diary(id_dd,date_dd,datestr_dd,weeknumber_dd,text_dd,reserved_dd) VALUES(null,:pdate,:pdatestr,:pweekno,:ptext,:pres);';
   { update daily diary table by parameters }
-  UpdSql = 'UPDATE daily_diary SET date_dd=p:date, weeknumber_dd=p:weekno, text_dd=p:text, reserved_dd=p:res WHERE id_dd=:pid;';
+  UpdSql = 'UPDATE daily_diary SET date_dd=:pdate, datestr_dd=:pdatestr, weeknumber_dd=:pweekno, text_dd=:ptext, reserved_dd=:pres WHERE id_dd=:pid;';
   { delete record from daily diary table by parameter }
   DelSql = 'DELETE FROM daily_diary WHERE id_dd=:pid;';
   { select all the records in daily diary table }
-  SelSql = 'SELECT * FROM daily_diary;';
+  SelSqlAsc = 'SELECT * FROM daily_diary ORDER BY id_dd ASC;';
+  SelSqlDesc = 'SELECT * FROM daily_diary ORDER BY weeknumber_dd DESC;';
   { get a hold on the last inserted id }
   LastIdSql = 'SELECT LAST_INSERT_ROWID() AS id_Last;';
-// alternative: LastIdDdSql = 'SELECT id_dd FROM daily_diary;';
+  LastId_ddSql = 'SELECT id_dd FROM daily_diary;';
 
   { modification states }
   mNone    = 0;
@@ -32,7 +33,7 @@ const
   mAltered = 5;
   mDelete  = 7;
 
-  GridHeaders: array[1..4]of string = ('Date','Weeknumber','Text','Reserved');
+  GridHeaders: array[1..5]of string = ('Date','Date as string','Weeknumber','Text','Reserved');
   BooleanText: array[boolean] of string = ('No','Yes');
 
   { keyboard codes }
@@ -53,6 +54,10 @@ const
   { function result codes }
   HR_OK    = 0;
   HR_ERROR = 1;
+
+type
+  { utility }
+  PInteger = ^integer;
 
 function DD_Databasename: string;
 function DD_Inifilename: string;
@@ -81,6 +86,9 @@ begin
   end;
 end;
 
+(*
+  TLongBoolHelper = Type Helper for LongBool
+*)
 end.
 
 
