@@ -21,17 +21,20 @@ const
   { delete record from daily diary table by parameter }
   DelSql = 'DELETE FROM daily_diary WHERE id_dd=:pid;';
   { select all the records in daily diary table }
-  SelSqlAsc = 'SELECT * FROM daily_diary ORDER BY id_dd ASC;';
-  SelSqlDesc = 'SELECT * FROM daily_diary ORDER BY weeknumber_dd DESC;';
+  SelSqlAsc = 'SELECT * FROM daily_diary ORDER BY date_dd ASC;';
+//  SelSqlAsc = 'SELECT * FROM daily_diary ORDER BY id_dd ASC;';
+  SelSqlDesc = 'SELECT * FROM daily_diary ORDER BY date_dd DESC;';
   { get a hold on the last inserted id }
   LastIdSql = 'SELECT LAST_INSERT_ROWID() AS id_Last;';
   LastId_ddSql = 'SELECT id_dd FROM daily_diary;';
 
+(* Moved to bom_dd.pas
   { modification states }
   mNone    = 0;
   mAdded   = 3;
   mAltered = 5;
-  mDelete  = 7;
+  mDelete  = 7; 
+*)
 
   GridHeaders: array[1..5]of string = ('Date','Date as string','Weeknumber','Text','Reserved');
   BooleanText: array[boolean] of string = ('No','Yes');
@@ -52,8 +55,8 @@ const
   DlgNo = 7;
 
   { function result codes }
-  HRHR_OK    = 0;
-  HRHR_ERROR = 1;
+  HR_OK    = 0;
+  HR_ERROR = 1;
 
 type
   { utility }

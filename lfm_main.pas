@@ -30,7 +30,9 @@ type
   TfrmMain = class(TForm)
     Button1: TButton;
     btnCalender: TButton;
+    Button2: TButton;
     dlgCalender: TCalendarDialog;
+    Edit1: TEdit;
     gbxControls: TGroupBox;
     gbxDates: TGroupBox;
     gbxText: TGroupBox;
@@ -49,7 +51,9 @@ type
     procedure btnCalenderClick(Sender: TObject);
     procedure btnDeleteClick(Sender: TObject);
     procedure btnEditClick(Sender: TObject);
+    procedure btnSaveClick(Sender: TObject);
     procedure Button1Click(Sender: TObject);
+    procedure Button2Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -141,6 +145,10 @@ end;
 { implements the observed, so we have to roll our own observer }
 procedure TfrmMain.FormShow(Sender: TObject); { ok }
 begin
+  { adjust width and height of form on startup }
+  Width:= 1300;
+  Height:= 600;
+  { end of adjusting }
   edtDate.Text:= bcDateToStr(Now);
           { if there are no nodes, create a root node with a parent of nil }
   Caption:= MainTitle;                            { from daily_diary_const }
@@ -232,6 +240,11 @@ begin
   {$endif}
 end;
 
+procedure TfrmMain.Button2Click(Sender: TObject);
+begin
+  // TODO...
+end;
+
 procedure TfrmMain.FormCreate(Sender: TObject);
 begin
   fBom:= CreateBom;                     { create our business object model }
@@ -283,6 +296,11 @@ begin
 //  ClearTreeview;
 //  fDate.Year.ToString;
 //  Self.ActiveControl:= memText;
+end;
+
+procedure TfrmMain.btnSaveClick(Sender: TObject);
+begin
+  // TODO...
 end;
 
 procedure TfrmMain.btnAddClick(Sender: TObject); { ok }
@@ -411,6 +429,8 @@ begin
   end;
   if aNode.HasChildren then lNode:= aNode.GetLastChild;
   while aNode.HasChildren do begin
+    { maybe we just skip the last child?!? }
+//    lNode:= lNode.GetPrevSibling;
     if lNode.Text = aSearchString then begin
 ShowMessage('Found Item: '+lNode.Text);
       Result:= lNode;

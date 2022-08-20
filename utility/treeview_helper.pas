@@ -72,7 +72,7 @@ var
   Node: TTreeNode;
 begin
   Result:= nil;
-  if aTree.Items.Count = 0 then exit;
+  if aTree.Items.Count = 0 then exit; { nothing to do }
   Node:= aTree.Items[0]; { ie.: root-node }
   while Node <> nil do begin
     if UpperCase(Node.Text) = UpperCase(aValue) then begin

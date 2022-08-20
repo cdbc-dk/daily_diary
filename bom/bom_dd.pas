@@ -13,6 +13,14 @@ uses
   bc_mtlinklist,
   bc_litedb,
   bc_observer;
+
+const
+  { modification states }
+  mNone    = 0;
+  mAdded   = 3;
+  mAltered = 5;
+  mDelete  = 7;
+
 type
   { TNamedMemorystream }
   TNamedMemorystream = class(TMemoryStream)
@@ -85,15 +93,17 @@ type
     constructor Create(anItemClass: TDDCollectionItemClass);
     destructor Destroy; override;
     function CheckTable: boolean; { creates a new table in db-file }
-    function Add_Dd: TDDCollectionItem;
-    function AddNew: TDDCollectionItem;
-    procedure BackupDb; { 19.04.2015 bc }
+    function Add_Dd: TDDCollectionItem; { creates a new item, owned by this collection }
+    function AddNew: TDDCollectionItem; { creates a new item without owner! }
+    procedure BackupDb; { 19.04.2015 bc //bm todo refactor }
     procedure AppendToDelta(anItem: TDDCollectionItem;HasConnection: boolean = false); { api }
     function GetItemFromID(const anId: ptruint): TDDCollectionItem;
     function IndexOf(anItem: TDDCollectionItem): ptrint; { 11.05.2015 bc, returns -1 on not found else collection ID }
     function UpdateDb(const UpdateNow: boolean;HasConnection: boolean = false): boolean; { refactored 29.07.2015 bc }
-    function ReadDb: boolean;
-    function ReadBlobDb(const Asc: boolean): boolean;
+    function ReadDb: boolean; deprecated;
+    function ReadData: boolean;              { storage agnostic 2022-08-16 /bc }
+    function ReadBlobDb(const Asc: boolean): boolean; deprecated;
+    function ReadDataWithBlob(const Asc: boolean): boolean; { storage agnostic 2022-08-16 /bc }
     { test }
     property Observed: TObserved read fObserved; // ææ
     { test end }
@@ -213,9 +223,9 @@ begin
   try fDb.RunSQL(daily_diary_const.CreateDb); except  end;
 end;
 
+{ creates a new item, owned by this collection }
 function TDDCollection.Add_Dd: TDDCollectionItem; { ok }
 begin
-//  Result:= fDeltaQueue.CreateNew;
   Result:= fDDItemClass.Create(Self);      { created with owner collection }
   Result.Id_DD:= 0;
   Result.Date.AsDate:= now;
@@ -254,16 +264,19 @@ begin
   if fDb.Connect then try                  { connect checks for connected }
     if not fDb.Transaction.Active then begin
       fDb.Transaction.StartTransaction;
-      fDb.Query.Close;
-      fDb.Query.SQL.Text:= InsSql;
-      fDb.Query.Prepare;
-      fDb.Query.ParamByName('pdate').AsInteger:= anItem.Date.AsInteger;
-      fDb.Query.ParamByName('pdatestr').AsString:= anItem.DateStr;
-      fDb.Query.ParamByName('pweekno').AsInteger:= anItem.Date.ISOWeekNumber;
+      fDb.Exec.Close;
+      fDb.Exec.SQL.Text:= InsSql;            //bm
+      fDb.Exec.Prepare;
+      fDb.Exec.ParamByName('pdate').AsInteger:= anItem.Date.AsInteger;
+      fDb.Exec.ParamByName('pdatestr').AsString:= anItem.DateStr;
+      fDb.Exec.ParamByName('pweekno').AsInteger:= anItem.Date.ISOWeekNumber;
       anItem.Text.Position:= 0; { always remember to reset position }
-      fDb.Query.ParamByName('ptext').LoadFromStream(anItem.Text,ftBlob);
-      fDb.Query.ParamByName('pres').AsString:= anItem.Reserved;
-      fDb.Query.ExecSQL;
+      fDb.Exec.ParamByName('ptext').LoadFromStream(anItem.Text,ftBlob);
+      fDb.Exec.ParamByName('pres').AsString:= anItem.Reserved;
+      fDb.Exec.ExecSQL;
+      Result:= fDb.LastInsertedId;             //bm
+      anItem.Id_DD:= Result;
+(* updated litedb
       {$ifdef id_dd}
       { now get a hold of our last entry Id_DD }
       fDb.Query.Close;
@@ -282,6 +295,7 @@ begin
       anItem.Id_DD:= Result;
       fDb.Query.Close;
       {$endif}
+*)
       fDb.Transaction.Commit;
       anItem.Modified:= mNone;
     end;
@@ -367,6 +381,7 @@ begin
   inherited Destroy;
 end;
 
+{ creates a new item without owner! }
 function TDDCollection.AddNew: TDDCollectionItem; { ok }
 begin
   Result:= fDeltaQueue.CreateNew;
@@ -429,13 +444,12 @@ begin
   end;
 end;
 
+{ fed an Id_DD it will search for and return the appropriate item or nil }
 function TDDCollection.GetItemFromID(const anId: ptruint): TDDCollectionItem;
 var
   Idx: ptruint;
-begin
+begin     //TODO: support ascending or descending sort order for quickest result
   Result:= nil;
-  if Self.Count = 0 then ShowMessage('ERROR: Collection is emty!');
-exit;
   { perform a linear search }
 //  for Idx:= 0 to Self.Count-1 do begin
   try
@@ -479,7 +493,7 @@ begin
   Result:= true;
 end; { refactored 29.07.2015 bc -> actual writes moved to "DoUpdate" }
 
-function TDDCollection.ReadDb: boolean; // db reads
+function TDDCollection.ReadData: boolean; // data read, no blob!
 var
   Ds: TMemDataset;
   Bci: TDDCollectionItem;
@@ -510,9 +524,14 @@ begin
   end;
   EndUpdate;
   if fDb.Connected then fDb.DisConnect;
+end; { ReadData }
+
+function TDDCollection.ReadDb: boolean; deprecated;
+begin
+  Result:= ReadData;
 end;
 
-function TDDCollection.ReadBlobDb(const Asc: boolean): boolean;
+function TDDCollection.ReadDataWithBlob(const Asc: boolean): boolean;
 var
   anItem: TDDCollectionItem;
   BlobStream: TStream;
@@ -538,6 +557,7 @@ begin
       anItem.WeekNumber:= fDb.Query.FieldByName('weeknumber_dd').AsInteger;
       anItem.Text.Position:= 0;
       BlobStream:= fDb.Query.CreateBlobStream(fDb.Query.FieldByName('text_dd'),bmRead);
+      BlobStream.Position:= 0;
       anItem.Text.CopyFrom(BlobStream,BlobStream.Size);
       BlobStream.Free;
       anItem.Reserved:= fDb.Query.FieldByName('reserved_dd').AsString;
@@ -547,10 +567,15 @@ begin
     EndUpdate;
     fDb.Transaction.Commit;
   end;
-ShowMessageFmt('Collection count: %d',[Self.Count]);
+//ShowMessageFmt('Collection count: %d',[Self.Count]);
   if fDb.Connected then fDb.DisConnect;          { no dangling connections }
   Result:= true;
-  Observed.FPONotifyObservers(Observed.Subject,ooCustom,pointer(Count));
+  Observed.FPONotifyObservers(Observed.Subject,ooCustom,pointer(Count)); { using ooCustom for 1.st dataread }
+end;
+
+function TDDCollection.ReadBlobDb(const Asc: boolean): boolean; deprecated;
+begin
+  Result:= ReadDataWithBlob(Asc);
 end;
 
 (*
@@ -583,7 +608,7 @@ end;
 initialization
   Singleton:= nil;
 finalization
-  FreeAndNil(Singleton);
+  FreeAndNil(Singleton); { beware, FreeAndNil does not check for nil! had a nasty av with this }
 end.
 
 
