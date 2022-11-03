@@ -1,11 +1,8 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <CONFIG>
   <ProjectOptions>
     <Version Value="12"/>
     <General>
-      <Flags>
-        <CompatibilityMode Value="True"/>
-      </Flags>
       <SessionStorage Value="InProjectDir"/>
       <Title Value="daily_diary"/>
       <Scaled Value="True"/>
@@ -14,15 +11,14 @@
       <XPManifest>
         <DpiAware Value="True"/>
       </XPManifest>
-      <Icon Value="0"/>
     </General>
     <MacroValues Count="1">
       <Macro1 Name="LCLWidgetType" Value="qt"/>
     </MacroValues>
-    <BuildModes Count="1">
-      <Item1 Name="Default" Default="True"/>
+    <BuildModes>
+      <Item Name="Default" Default="True"/>
       <SharedMatrixOptions Count="1">
-        <Item1 ID="838475807544" Modes="Default" Type="IDEMacro" MacroName="LCLWidgetType" Value="qt"/>
+        <Item1 ID="598117599881" Modes="Default" Type="IDEMacro" MacroName="LCLWidgetType" Value="qt"/>
       </SharedMatrixOptions>
     </BuildModes>
     <PublishOptions>
@@ -32,31 +28,23 @@
     <RunParams>
       <FormatVersion Value="2"/>
     </RunParams>
-    <RequiredPackages Count="1">
-      <Item1>
+    <RequiredPackages>
+      <Item>
         <PackageName Value="LCL"/>
-      </Item1>
+      </Item>
     </RequiredPackages>
-    <Units Count="4">
-      <Unit0>
+    <Units>
+      <Unit>
         <Filename Value="daily_diary.lpr"/>
         <IsPartOfProject Value="True"/>
-      </Unit0>
-      <Unit1>
-        <Filename Value="lfm_main.pas"/>
+      </Unit>
+      <Unit>
+        <Filename Value="lfm_dataaware.pas"/>
         <IsPartOfProject Value="True"/>
-        <ComponentName Value="frmMain"/>
+        <ComponentName Value="frmDataAware"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-      </Unit1>
-      <Unit2>
-        <Filename Value="const/daily_diary_const.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit2>
-      <Unit3>
-        <Filename Value="bom/bom_dd.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit3>
+      </Unit>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
@@ -65,11 +53,14 @@
       <Filename Value="daily_diary"/>
     </Target>
     <SearchPaths>
-      <IncludeFiles Value="$(ProjOutDir);../../bc_rtl/include"/>
-      <OtherUnitFiles Value="global;bom;../../bc_rtl;utility"/>
+      <IncludeFiles Value="$(ProjOutDir);../../bc_rtl/inc"/>
+      <OtherUnitFiles Value="../../bc_rtl;bom;global;../../bc_rtl/frames"/>
       <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <Linking>
+      <Debugging>
+        <DebugInfoType Value="dsDwarf3"/>
+      </Debugging>
       <Options>
         <Win32>
           <GraphicApplication Value="True"/>
@@ -78,19 +69,19 @@
     </Linking>
   </CompilerOptions>
   <Debugging>
-    <Exceptions Count="4">
-      <Item1>
+    <Exceptions>
+      <Item>
         <Name Value="EAbort"/>
-      </Item1>
-      <Item2>
+      </Item>
+      <Item>
         <Name Value="ECodetoolError"/>
-      </Item2>
-      <Item3>
+      </Item>
+      <Item>
         <Name Value="EFOpenError"/>
-      </Item3>
-      <Item4>
+      </Item>
+      <Item>
         <Name Value="ESQLDatabaseError"/>
-      </Item4>
+      </Item>
     </Exceptions>
   </Debugging>
 </CONFIG>

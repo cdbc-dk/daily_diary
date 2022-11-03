@@ -1,4 +1,4 @@
-
+﻿
 uses
   Db, bc_guardian, bc_msgqueue, bc_strings, bc_datetime,
   bc_litedb, blob_const;
@@ -73,6 +73,7 @@ begin
     { creates a new db if not existing }
     try Db.RunSQL(CreateBlobDb); except Result:= false; end;
   finally FreeAndNil(Db); end;
+end;
 
 { setup our database, temporarily disabling connected components }
 procedure TForm1.PrepareTransaction;
@@ -105,6 +106,7 @@ begin
     fDb.Query.ParamByName('pfilename').AsString:= ExtractFileName(OpenDialog1.FileName);
     fDb.Query.ParamByName('pcontent').LoadFromFile(OpenDialog1.FileName, ftBlob);
     fDb.Query.ExecSQL;                { now go ahead and insert our new record }
+    fDb.Query.UnPrepare; { closing preparation }
     {$ifdef debug}
       fDb.Query.Close;
       fDb.Query.SQL.Text:= LastIdSql;
